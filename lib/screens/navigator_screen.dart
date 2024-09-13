@@ -6,6 +6,8 @@ import 'liked_screen.dart';
 import 'map_screen.dart';
 
 class NavigatorScreen extends StatefulWidget {
+  const NavigatorScreen({super.key});
+
   @override
   _NavigatorScreenState createState() => _NavigatorScreenState();
 }
@@ -13,7 +15,7 @@ class NavigatorScreen extends StatefulWidget {
 class _NavigatorScreenState extends State<NavigatorScreen> {
   int _selectedIndex = 0;
 
-  static List<Widget> _widgetOptions = <Widget>[
+  static final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
     const RandomScreen(),
     const SearchScreen(),
@@ -50,15 +52,16 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
     );
   }
 
-  BottomNavigationBarItem _buildBottomNavigationBarItem(IconData icon, String label, int index) {
+  BottomNavigationBarItem _buildBottomNavigationBarItem(
+      IconData icon, String label, int index) {
     return BottomNavigationBarItem(
       icon: _selectedIndex == index
           ? Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Color(0xFFFFEEAD),
               ),
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Icon(icon),
             )
           : Icon(icon),
