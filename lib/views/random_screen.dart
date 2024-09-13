@@ -7,9 +7,9 @@ class RandomScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('RandomScreen'),
+        title: const Text('RandomScreen'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('RandomScreen'),
       ),
     );

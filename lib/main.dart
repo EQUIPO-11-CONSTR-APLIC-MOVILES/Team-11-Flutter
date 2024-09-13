@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/navigator_screen.dart';
-import 'theme.dart';
+import 'views/splash_screen.dart';
 
 void main() {
   runApp(const RestaUApp());
@@ -11,10 +10,9 @@ class RestaUApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'RestaU',
-      theme: restauTheme,
-      home: NavigatorScreen(),
+      home: SplashScreen(),
     );
   }
 }
