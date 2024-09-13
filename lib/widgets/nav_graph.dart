@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import '../screens/home_screen.dart';
+import '../views/home_screen.dart';
 
 class NavGraph extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
 
-  NavGraph({required this.navigatorKey});
+  const NavGraph({super.key, required this.navigatorKey});
 
   @override
   Widget build(BuildContext context) {

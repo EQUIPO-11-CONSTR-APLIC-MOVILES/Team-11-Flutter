@@ -7,9 +7,9 @@ class LikedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('LikedScreen'),
+        title: const Text('LikedScreen'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('LikedScreen'),
       ),
     );
