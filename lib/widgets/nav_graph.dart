@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../views/home_screen.dart';
+import '/views/home_screen.dart';
 
 class NavGraph extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
