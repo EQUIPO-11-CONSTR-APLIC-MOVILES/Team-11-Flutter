@@ -10,89 +10,85 @@ class MapScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => MapViewModel(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('MapScreen'),
-        ),
-        body: Stack(
-          children: [
-            Consumer<MapViewModel>(
-              builder: (context, viewModel, child) {
-                if (!viewModel.state.permissionsGranted) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: viewModel.state.startLocation,
-                    zoom: 15.0,
+      child: Stack(
+        children: [
+          Consumer<MapViewModel>(
+            builder: (context, viewModel, child) {
+              if (!viewModel.state.permissionsGranted) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: viewModel.state.startLocation,
+                  zoom: 15.0,
+                ),
+                myLocationEnabled: viewModel.state.permissionsGranted,
+                myLocationButtonEnabled: viewModel.state.permissionsGranted,
+                circles: {
+                  Circle(
+                    circleId: const CircleId('circle'),
+                    center: viewModel.state.circleLocation,
+                    radius: viewModel.state.circleRadius * 1000, // Convert km to meters
+                    fillColor: Colors.blue.withOpacity(0.2),
+                    strokeColor: Colors.blue,
+                    strokeWidth: 1,
                   ),
-                  myLocationEnabled: viewModel.state.permissionsGranted,
-                  myLocationButtonEnabled: viewModel.state.permissionsGranted,
-                  circles: {
-                    Circle(
-                      circleId: const CircleId('circle'),
-                      center: viewModel.state.circleLocation,
-                      radius: viewModel.state.circleRadius * 1000, // Convert km to meters
-                      fillColor: Colors.blue.withOpacity(0.5),
-                      strokeColor: Colors.blue,
-                      strokeWidth: 1,
-                    ),
-                  },
-                  // Add markers for restaurants if needed
+                },
+                buildingsEnabled: false,
+                // Add markers for restaurants if needed
+              );
+            },
+          ),
+          Positioned(
+            bottom: 10,
+            left: 10,
+            right: 10,
+            child: Consumer<MapViewModel>(
+              builder: (context, viewModel, child) {
+                return Container(
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.0),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4.0,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust the padding as needed
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Search range:'),
+                            Text('${viewModel.state.circleRadius.toStringAsFixed(1)} km'),
+                          ],
+                        ),
+                      ),
+                      Slider(
+                        value: viewModel.state.circleRadius,
+                        min: 0.1,
+                        max: 1.5,
+                        divisions: 99,
+                        label: viewModel.state.circleRadius.toStringAsFixed(1),
+                        onChanged: (value) {
+                          viewModel.updateCircleRadius(value);
+                        },
+                        activeColor: const Color(0xFFD9534F),
+                        inactiveColor: const Color(0xFFFFEEAD),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
-            Positioned(
-              bottom: 10,
-              left: 10,
-              right: 10,
-              child: Consumer<MapViewModel>(
-                builder: (context, viewModel, child) {
-                  return Container(
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.0),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 4.0,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust the padding as needed
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Search range:'),
-                              Text('${viewModel.state.circleRadius.toStringAsFixed(1)} km'),
-                            ],
-                          ),
-                        ),
-                        Slider(
-                          value: viewModel.state.circleRadius,
-                          min: 0.1,
-                          max: 1.5,
-                          divisions: 99,
-                          label: viewModel.state.circleRadius.toStringAsFixed(1),
-                          onChanged: (value) {
-                            viewModel.updateCircleRadius(value);
-                          },
-                          activeColor: const Color(0xFFD9534F),
-                          inactiveColor: const Color(0xFFFFEEAD),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
