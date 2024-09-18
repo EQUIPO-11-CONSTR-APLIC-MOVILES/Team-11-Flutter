@@ -14,29 +14,34 @@ class MapScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('MapScreen'),
         ),
-        body: Stack(
-          children: [
-            Consumer<MapViewModel>(
-              builder: (context, viewModel, child) {
-                if (!viewModel.state.permissionsGranted) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Access to location has not been granted.',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                        const SizedBox(height: 16.0),
-                        ElevatedButton(
-                          onPressed: viewModel.openAppSettings, // Call ViewModel method
-                          child: const Text('Open App Settings'),
-                        ),
-                      ],
+        body: Consumer<MapViewModel>(
+          builder: (context, viewModel, child) {
+            if (viewModel.state.isCheckingPermissions) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (!viewModel.state.permissionsGranted) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Access to location has not been granted.',
+                      style: TextStyle(fontSize: 16.0),
                     ),
-                  );
-                }
-                return GoogleMap(
+                    const SizedBox(height: 16.0),
+                    ElevatedButton(
+                      onPressed: viewModel.openAppSettings,
+                      child: const Text('Open App Settings'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            // Only render the map and the range slider if permissions are granted
+            return Stack(
+              children: [
+                GoogleMap(
                   initialCameraPosition: CameraPosition(
                     target: viewModel.state.startLocation,
                     zoom: 15.0,
@@ -53,17 +58,12 @@ class MapScreen extends StatelessWidget {
                       strokeWidth: 1,
                     ),
                   },
-                  // TODO Add markers for each restaurant
-                );
-              },
-            ),
-            Positioned(
-              bottom: 10,
-              left: 10,
-              right: 10,
-              child: Consumer<MapViewModel>(
-                builder: (context, viewModel, child) {
-                  return Container(
+                ),
+                Positioned(
+                  bottom: 10,
+                  left: 10,
+                  right: 10,
+                  child: Container(
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -102,11 +102,11 @@ class MapScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                  );
-                },
-              ),
-            ),
-          ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
