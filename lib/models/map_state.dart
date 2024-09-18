@@ -6,6 +6,7 @@ class MapState {
   final List<Restaurant> restaurants;
   final LatLng circleLocation;
   final double circleRadius;
+  final bool isCheckingPermissions;
 
   MapState({
     this.startLocation = const LatLng(4.603096177609384, -74.06584744436493),
@@ -13,6 +14,7 @@ class MapState {
     this.restaurants = const [],
     this.circleLocation = const LatLng(4.603096177609384, -74.06584744436493),
     this.circleRadius = 0.1,
+    this.isCheckingPermissions = true,
   });
 }
 
