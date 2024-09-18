@@ -19,7 +19,22 @@ class MapScreen extends StatelessWidget {
             Consumer<MapViewModel>(
               builder: (context, viewModel, child) {
                 if (!viewModel.state.permissionsGranted) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Access to location has not been granted.',
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                        const SizedBox(height: 16.0),
+                        ElevatedButton(
+                          onPressed: viewModel.openAppSettings, // Call ViewModel method
+                          child: const Text('Open App Settings'),
+                        ),
+                      ],
+                    ),
+                  );
                 }
                 return GoogleMap(
                   initialCameraPosition: CameraPosition(
@@ -38,7 +53,7 @@ class MapScreen extends StatelessWidget {
                       strokeWidth: 1,
                     ),
                   },
-                  // Add markers for restaurants if needed
+                  // TODO Add markers for each restaurant
                 );
               },
             ),
@@ -64,7 +79,7 @@ class MapScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust the padding as needed
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [

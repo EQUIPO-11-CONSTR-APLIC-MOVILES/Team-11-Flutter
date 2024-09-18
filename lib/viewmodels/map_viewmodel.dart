@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:restau/models/map_state.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MapViewModel extends ChangeNotifier {
   MapState _state = MapState();
@@ -66,5 +67,9 @@ class MapViewModel extends ChangeNotifier {
       circleRadius: radius,
     );
     notifyListeners();
+  }
+
+  Future<void> openAppSettings() async {
+    await launchUrl(Uri.parse('app-settings:'));
   }
 }
