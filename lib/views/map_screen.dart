@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:restau/viewmodels/map_viewmodel.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
@@ -20,90 +21,12 @@ class MapScreen extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             if (!viewModel.state.permissionsGranted) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Access to location has not been granted.',
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                    const SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: viewModel.openAppSettings,
-                      child: const Text('Open App Settings'),
-                    ),
-                  ],
-                ),
-              );
+              return _buildPermissionsDeniedView(viewModel);
             }
-
-            // Only render the map and the range slider if permissions are granted
             return Stack(
               children: [
-                GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: viewModel.state.startLocation,
-                    zoom: 15.0,
-                  ),
-                  myLocationEnabled: viewModel.state.permissionsGranted,
-                  myLocationButtonEnabled: viewModel.state.permissionsGranted,
-                  circles: {
-                    Circle(
-                      circleId: const CircleId('circle'),
-                      center: viewModel.state.circleLocation,
-                      radius: viewModel.state.circleRadius * 1000, // Convert km to meters
-                      fillColor: Colors.blue.withOpacity(0.5),
-                      strokeColor: Colors.blue,
-                      strokeWidth: 1,
-                    ),
-                  },
-                ),
-                Positioned(
-                  bottom: 10,
-                  left: 10,
-                  right: 10,
-                  child: Container(
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.0),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 4.0,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Search range:'),
-                              Text('${viewModel.state.circleRadius.toStringAsFixed(1)} km'),
-                            ],
-                          ),
-                        ),
-                        Slider(
-                          value: viewModel.state.circleRadius,
-                          min: 0.1,
-                          max: 1.5,
-                          divisions: 99,
-                          label: viewModel.state.circleRadius.toStringAsFixed(1),
-                          onChanged: (value) {
-                            viewModel.updateCircleRadius(value);
-                          },
-                          activeColor: const Color(0xFFD9534F),
-                          inactiveColor: const Color(0xFFFFEEAD),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                _googleMap(viewModel),
+                _slider(viewModel),
               ],
             );
           },
@@ -111,4 +34,118 @@ class MapScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildPermissionsDeniedView(MapViewModel viewModel) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
+            'lib/assets/drawable/no_permissions.svg',
+            width: 65,
+            height: 65,
+            color: Colors.grey,
+          ),
+          const Text(
+            "RestaU's Map needs precise location permissions",
+            style: TextStyle(
+              color: Colors.grey,
+              fontFamily: 'Poppins',
+              fontSize: 22.0,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16.0),
+          ElevatedButton(
+            onPressed: viewModel.openAppSettings,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFD9534F), // Set the background color here
+            ),
+            child: const Text(
+              "Give Permissions",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Poppins',
+                fontSize: 17.0,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _googleMap(MapViewModel viewModel) {
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: viewModel.state.startLocation,
+        zoom: 15.0,
+      ),
+      myLocationEnabled: viewModel.state.permissionsGranted,
+      myLocationButtonEnabled: viewModel.state.permissionsGranted,
+      circles: {
+        Circle(
+          circleId: const CircleId('circle'),
+          center: viewModel.state.circleLocation,
+          radius: viewModel.state.circleRadius * 1000,
+          fillColor: Colors.blue.withOpacity(0.5),
+          strokeColor: Colors.blue,
+          strokeWidth: 1,
+        ),
+      },
+    );
+  }
+
+  Widget _slider(MapViewModel viewModel) {
+    return Positioned(
+      bottom: 10,
+      left: 10,
+      right: 10,
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 4.0,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Search range:'),
+                  Text('${viewModel.state.circleRadius.toStringAsFixed(1)} km'),
+                ],
+              ),
+            ),
+            Slider(
+              value: viewModel.state.circleRadius,
+              min: 0.1,
+              max: 1.5,
+              divisions: 99,
+              label: viewModel.state.circleRadius.toStringAsFixed(1),
+              onChanged: (value) {
+                viewModel.updateCircleRadius(value);
+              },
+              activeColor: const Color(0xFFD9534F),
+              inactiveColor: const Color(0xFFFFEEAD),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 }

@@ -34,6 +34,7 @@ dependencies:
   provider: ^6.0.0
   google_sign_in: ^5.0.0
   permission_handler: ^10.2.0
+  flutter_svg: ^1.0.3
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -41,6 +42,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   google_maps_flutter_web: ^0.5.10
   location: ^6.0.2
+  firebase_core: ^3.5.0
 
 dev_dependencies:
   flutter_test:
@@ -59,7 +61,14 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - lib/assets/restau.png
+    - lib/assets/drawable/restau.png
+    - lib/assets/drawable/no_permissions.svg
+  fonts:
+  - family: Poppins
+    fonts:
+      - asset: lib/assets/font/poppins_regular.ttf
+      - asset: lib/assets/font/poppins_semibold.ttf
+        weight: 600
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -37,7 +37,7 @@ class SplashScreenState extends State<SplashScreen> {
       ),
     ),
     child: Center(
-      child: Image.asset('lib/assets/restau.png'),
+      child: Image.asset('lib/assets/drawable/restau.png'),
     ),
   );
 }
