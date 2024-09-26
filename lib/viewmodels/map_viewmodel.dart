@@ -87,16 +87,18 @@ class MapViewModel extends ChangeNotifier {
 
     final restaurants = await _firestoreService.getAllRestaurants();
     _state = _state.copyWith(
-      restaurants: restaurants.map((data) => Restaurant.fromMap(data)).toList(),
-      isCheckingPermissions: false,
+      restaurants: restaurants.map((data) => Restaurant.fromMap(data)).toList()
     );
+    print(_state.restaurants);
   }
 
-  void updateRestaurantDistances () {
-    for (final restaurant in _state.restaurants) {
+  void updateRestaurantDistances() {
+    List<Restaurant> modifiableList = List.from(_state.restaurants);
+    for (final restaurant in modifiableList) {
       restaurant.calculateDistance(_state.userLocation);
     }
-    _state.restaurants.sort((a, b) => a.distance.compareTo(b.distance));
+    modifiableList.sort((a, b) => a.distance.compareTo(b.distance));
+    _state = _state.copyWith(restaurants: modifiableList);
   }
 
   int _binarySearch(List<Restaurant> restaurants) {

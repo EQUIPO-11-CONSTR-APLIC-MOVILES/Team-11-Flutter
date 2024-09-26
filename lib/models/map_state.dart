@@ -46,17 +46,30 @@ class Restaurant {
   final String name;
   final LatLng location;
   double distance;
+  final double averageRating;
+  final String imageUrl;
 
   Restaurant({
     required this.name,
     required this.location,
     this.distance = 0.0,
+    required this.averageRating,
+    required this.imageUrl,
   });
 
   factory Restaurant.fromMap(Map<String, dynamic> data) {
+    double rating;
+    if (data['averageRating'] is int) {
+      rating = (data['averageRating'] as int).toDouble();
+    } else {
+      rating = data['averageRating'];
+    }
+
     return Restaurant(
       name: data['name'],
       location: LatLng(data['latitude'], data['longitude']),
+      averageRating: rating,
+      imageUrl: data['imageUrl'],
     );
   }
 
