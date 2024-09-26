@@ -82,7 +82,7 @@ class MapScreen extends StatelessWidget {
   Widget _googleMap(MapViewModel viewModel) {
     return GoogleMap(
       initialCameraPosition: CameraPosition(
-        target: viewModel.state.startLocation,
+        target: viewModel.state.userLocation,
         zoom: 15.0,
       ),
       myLocationEnabled: viewModel.state.permissionsGranted,
@@ -97,6 +97,13 @@ class MapScreen extends StatelessWidget {
           strokeWidth: 1,
         ),
       },
+      markers: viewModel.state.nearRestaurants.map((restaurant) {
+        return Marker(
+          markerId: MarkerId(restaurant.name),
+          position: restaurant.location,
+          infoWindow: InfoWindow(title: restaurant.name),
+        );
+      }).toSet(),
     );
   }
 
@@ -132,7 +139,7 @@ class MapScreen extends StatelessWidget {
             ),
             Slider(
               value: viewModel.state.circleRadius,
-              min: 0.1,
+              min: 0,
               max: 1.5,
               divisions: 99,
               label: viewModel.state.circleRadius.toStringAsFixed(1),

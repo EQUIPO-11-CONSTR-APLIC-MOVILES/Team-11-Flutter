@@ -3,8 +3,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as location_pkg;
 import 'package:permission_handler/permission_handler.dart' as permission_handler_pkg;
 import 'package:restau/models/map_state.dart';
+import '../models/firestore_service.dart';
 
 class MapViewModel extends ChangeNotifier {
+  final FirestoreService _firestoreService = FirestoreService();
   MapState _state = MapState();
   MapState get state => _state;
   final location_pkg.Location _location = location_pkg.Location();
@@ -12,6 +14,7 @@ class MapViewModel extends ChangeNotifier {
 
   MapViewModel() {
     _requestPermission();
+    fetchRestaurants();
   }
 
   Future<void> _requestPermission() async {
@@ -38,57 +41,84 @@ class MapViewModel extends ChangeNotifier {
 
     _location.onLocationChanged.listen((location_pkg.LocationData currentLocation) {
       if (!_initialLocationSet) {
-        _state = MapState(
-          startLocation: LatLng(currentLocation.latitude!, currentLocation.longitude!),
+        _state = _state.copyWith(
+          userLocation: LatLng(currentLocation.latitude!, currentLocation.longitude!),
           circleLocation: LatLng(currentLocation.latitude!, currentLocation.longitude!),
           permissionsGranted: true,
-          restaurants: _state.restaurants,
-          circleRadius: _state.circleRadius,
           isCheckingPermissions: false,
         );
         _initialLocationSet = true;
-        notifyListeners();
+        updateShownRestaurants();
       } else {
-        _state = MapState(
-          startLocation: _state.startLocation,
+        _state = _state.copyWith(
           circleLocation: LatLng(currentLocation.latitude!, currentLocation.longitude!),
           permissionsGranted: true,
-          restaurants: _state.restaurants,
-          circleRadius: _state.circleRadius,
           isCheckingPermissions: false,
         );
-        notifyListeners();
       }
+      updateRestaurantDistances();
+      notifyListeners();
     });
 
     _updatePermissionStatus(true);
   }
 
   void _updatePermissionStatus(bool permissionsGranted) {
-    _state = MapState(
-      startLocation: _state.startLocation,
-      circleLocation: _state.circleLocation,
+    _state = _state.copyWith(
       permissionsGranted: permissionsGranted,
-      restaurants: _state.restaurants,
-      circleRadius: _state.circleRadius,
-      isCheckingPermissions: false,
+      isCheckingPermissions: false
     );
     notifyListeners();
   }
 
   void updateCircleRadius(double radius) {
-    _state = MapState(
-      startLocation: _state.startLocation,
-      circleLocation: _state.circleLocation,
-      permissionsGranted: _state.permissionsGranted,
-      restaurants: _state.restaurants,
-      circleRadius: radius,
-      isCheckingPermissions: _state.isCheckingPermissions,
-    );
+    _state = _state.copyWith(circleRadius: radius);
+    updateShownRestaurants();
     notifyListeners();
   }
 
   Future<void> openAppSettings() async {
     await permission_handler_pkg.openAppSettings();
+  }
+
+  Future<void> fetchRestaurants() async {
+    _state = _state.copyWith(isCheckingPermissions: true);
+
+    final restaurants = await _firestoreService.getAllRestaurants();
+    _state = _state.copyWith(
+      restaurants: restaurants.map((data) => Restaurant.fromMap(data)).toList(),
+      isCheckingPermissions: false,
+    );
+  }
+
+  void updateRestaurantDistances () {
+    for (final restaurant in _state.restaurants) {
+      restaurant.calculateDistance(_state.userLocation);
+    }
+    _state.restaurants.sort((a, b) => a.distance.compareTo(b.distance));
+  }
+
+  int _binarySearch(List<Restaurant> restaurants) {
+    if (_state.circleRadius == 0) {
+      return 0;
+    }
+    
+    int low = 0;
+    int high = restaurants.length - 1;
+
+    while (low <= high) {
+      int mid = (low + high) ~/ 2;
+      if (restaurants[mid].distance <= _state.circleRadius) {
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+    return low;
+  }
+
+  void updateShownRestaurants() {
+    int index = _binarySearch(_state.restaurants);
+  _state = _state.copyWith(nearRestaurants: _state.restaurants.sublist(0, index));
   }
 }
