@@ -57,6 +57,7 @@ class MapViewModel extends ChangeNotifier {
         );
       }
       updateRestaurantDistances();
+      updateShownRestaurants();
       notifyListeners();
     });
 
@@ -102,7 +103,7 @@ class MapViewModel extends ChangeNotifier {
     if (_state.circleRadius == 0) {
       return 0;
     }
-    
+
     int low = 0;
     int high = restaurants.length - 1;
 
