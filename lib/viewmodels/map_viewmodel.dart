@@ -48,7 +48,6 @@ class MapViewModel extends ChangeNotifier {
           isCheckingPermissions: false,
         );
         _initialLocationSet = true;
-        updateShownRestaurants();
       } else {
         _state = _state.copyWith(
           circleLocation: LatLng(currentLocation.latitude!, currentLocation.longitude!),
@@ -56,7 +55,7 @@ class MapViewModel extends ChangeNotifier {
           isCheckingPermissions: false,
         );
       }
-      updateRestaurantDistances();
+      updateRestaurantDistances(currentLocation);
       updateShownRestaurants();
       notifyListeners();
     });
@@ -89,13 +88,12 @@ class MapViewModel extends ChangeNotifier {
     _state = _state.copyWith(
       restaurants: restaurants.map((data) => Restaurant.fromMap(data)).toList()
     );
-    print(_state.restaurants);
   }
 
-  void updateRestaurantDistances() {
+  void updateRestaurantDistances(location_pkg.LocationData currentLocation) {
     List<Restaurant> modifiableList = List.from(_state.restaurants);
     for (final restaurant in modifiableList) {
-      restaurant.calculateDistance(_state.userLocation);
+      restaurant.calculateDistance(LatLng(currentLocation.latitude!, currentLocation.longitude!));
     }
     modifiableList.sort((a, b) => a.distance.compareTo(b.distance));
     _state = _state.copyWith(restaurants: modifiableList);
