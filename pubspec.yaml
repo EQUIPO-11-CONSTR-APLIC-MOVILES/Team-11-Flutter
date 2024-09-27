@@ -65,6 +65,7 @@ flutter:
   assets:
     - lib/assets/drawable/restau.png
     - lib/assets/drawable/no_permissions.svg
+    - lib/assets/drawable/default_restaurant.png
   fonts:
   - family: Poppins
     fonts:

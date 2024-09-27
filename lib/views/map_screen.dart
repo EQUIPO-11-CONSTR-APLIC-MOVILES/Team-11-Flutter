@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:restau/models/map_state.dart';
 import 'package:restau/viewmodels/map_viewmodel.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:restau/widgets/info_window.dart';
 
 class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
@@ -25,7 +27,7 @@ class MapScreen extends StatelessWidget {
             }
             return Stack(
               children: [
-                _googleMap(viewModel),
+                _googleMap(viewModel, context),
                 _slider(viewModel),
               ],
             );
@@ -79,10 +81,10 @@ class MapScreen extends StatelessWidget {
     );
   }
 
-  Widget _googleMap(MapViewModel viewModel) {
+  Widget _googleMap(MapViewModel viewModel, BuildContext context) {
     return GoogleMap(
       initialCameraPosition: CameraPosition(
-        target: viewModel.state.startLocation,
+        target: viewModel.state.userLocation,
         zoom: 15.0,
       ),
       myLocationEnabled: viewModel.state.permissionsGranted,
@@ -97,7 +99,29 @@ class MapScreen extends StatelessWidget {
           strokeWidth: 1,
         ),
       },
+      markers: viewModel.state.nearRestaurants.map((restaurant) {
+        return Marker(
+          markerId: MarkerId(restaurant.name),
+          position: restaurant.location,
+          icon: _selectIcon(restaurant),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  content: CustomInfoWindow(restaurant: restaurant),
+                );
+              },
+            );
+          },
+        );
+      }).toSet(),
     );
+  }
+
+  BitmapDescriptor _selectIcon(Restaurant restaurant) {
+    // TODO: If new, return a custom
+    return BitmapDescriptor.defaultMarker;
   }
 
   Widget _slider(MapViewModel viewModel) {
@@ -132,7 +156,7 @@ class MapScreen extends StatelessWidget {
             ),
             Slider(
               value: viewModel.state.circleRadius,
-              min: 0.1,
+              min: 0,
               max: 1.5,
               divisions: 99,
               label: viewModel.state.circleRadius.toStringAsFixed(1),
