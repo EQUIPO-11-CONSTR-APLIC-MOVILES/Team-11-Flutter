@@ -13,4 +13,16 @@ class FirestoreService {
       return [];
     }
   }
+
+  // Add a new navigation path
+  Future<void> addNavigationPath(String originScreen, String destinyScreen) async {
+    try {
+      await _db.collection('navigation_paths').add({
+        'originScreen': originScreen,
+        'destinyScreen': destinyScreen,
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }

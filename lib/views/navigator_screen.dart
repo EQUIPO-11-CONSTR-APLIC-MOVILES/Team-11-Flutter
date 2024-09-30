@@ -6,6 +6,7 @@ import 'random_screen.dart';
 import 'search_screen.dart';
 import 'liked_screen.dart';
 import 'map_screen.dart';
+import '../models/firestore_service.dart';
 
 class NavigatorScreen extends StatelessWidget {
   const NavigatorScreen({super.key});
