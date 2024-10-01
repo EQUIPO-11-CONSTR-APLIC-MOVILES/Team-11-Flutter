@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:restau/viewmodels/log_in_viewmodel.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -11,20 +12,33 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
+  LogInViewmodel vm = LogInViewmodel();
+
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
   bool _obscurePassword = true;
+  String? _errorMessage; // Variable to hold the error message
 
   void attemptSignIn() async {
-    // Handle sign-in logic here
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: userController.text, 
-      password: passwordController.text,
-    );
+    setState(() {
+      _errorMessage = null; // Reset error message
+    });
+
+    vm.logIn(userController.text, passwordController.text);
+
+    await Future.delayed(const Duration(seconds: 2));
+    setState(() {
+      _errorMessage = "Sign-in failed.";
+    });
   }
 
-  void signInGoogle() {
-    // Handle Google sign-in logic here
+  void signInGoogle() async {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      // TODO: remove
+      email: 'a@a.com',
+      password: 'aaaaaa',
+    );
   }
 
   void signUp() {
@@ -57,7 +71,6 @@ class _LogInScreenState extends State<LogInScreen> {
           body: Padding(
             padding: const EdgeInsets.all(51),
             child: Column(
-              
               children: [
                 SizedBox(
                   width: imageSize, // Image is 35% of the screen width
@@ -122,6 +135,17 @@ class _LogInScreenState extends State<LogInScreen> {
                     child: const Text('Sign In'),
                   ),
                 ),
+                // Error message shown if sign-in fails
+                if (_errorMessage != null) ...[
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
                 SizedBox(height: elementSpacing),
                 const Text.rich(TextSpan(
                   text: '────────── ', // default text style
