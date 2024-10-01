@@ -61,9 +61,9 @@ class _LogInScreenState extends State<LogInScreen> {
                     color: const Color(0xFFD9534F),
                   ),
                 ),
-                Row(
+                const Row(
                   children: [
-                    const Text(
+                    Text(
                       "Login",
                       style: TextStyle(
                         fontFamily: "Poppins",
@@ -112,8 +112,7 @@ class _LogInScreenState extends State<LogInScreen> {
                   child: FilledButton(
                     onPressed: attemptSignIn,
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(const Color(0xFFD9534F)),
-                      
+                      backgroundColor: WidgetStateProperty.all(const Color(0xFFD9534F)),
                     ),
                     child: const Text('Sign In'),
                   ),
