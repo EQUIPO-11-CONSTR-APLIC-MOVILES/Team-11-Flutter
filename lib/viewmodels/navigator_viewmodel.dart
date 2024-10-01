@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
-import '../models/firestore_service.dart';
+import 'package:restau/models/firestore_service.dart';
 
 class NavigatorViewModel extends ChangeNotifier {
-  final FirestoreService _firestoreService = FirestoreService();
   int _selectedIndex = 0;
+  final FirestoreService _firestoreService = FirestoreService();
+  String navigationPath = 'Home'; // Initial path is Home
+  late String sessionId;
+
+  NavigatorViewModel() {
+    initializeSessionId();
+  }
+
+  void initializeSessionId() async {
+    sessionId = await addNavigationPathToFirestore();
+  }
 
   int get selectedIndex => _selectedIndex;
 
@@ -15,12 +25,27 @@ class NavigatorViewModel extends ChangeNotifier {
     4: 'Map',
   };
 
+  void addNavigationPath(int index) {
+    String? screen = screenNames[index];
+    if (screen != null) {
+      if (!navigationPath.endsWith(screen)) {
+        navigationPath = '$navigationPath > $screen';
+      }
+      updateNavigationPathInFirestore();
+    }
+  }
+
   void onItemTapped(int index) {
-
-
-
-    _firestoreService.addNavigationPath(screenNames[_selectedIndex]!, screenNames[index]!);
+    addNavigationPath(index);
     _selectedIndex = index;
     notifyListeners();
+  }
+
+  Future<String> addNavigationPathToFirestore() async {
+    return await _firestoreService.addNavigationPath(navigationPath);
+  }
+
+  void updateNavigationPathInFirestore() {
+    _firestoreService.updateNavigationPath(sessionId, navigationPath);
   }
 }

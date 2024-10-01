@@ -26,19 +26,19 @@ class SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-  return Container(
-    decoration: const BoxDecoration(
-      gradient: RadialGradient(
-        colors: [
-          Color(0xFFFFAD60),
-          Color(0xFFD9534F),
-        ],
-        radius: 0.85,
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: RadialGradient(
+          colors: [
+            Color(0xFFFFAD60),
+            Color(0xFFD9534F),
+          ],
+          radius: 0.85,
+        ),
       ),
-    ),
-    child: Center(
-      child: Image.asset('lib/assets/drawable/restau.png'),
-    ),
-  );
-}
+      child: Center(
+        child: Image.asset('lib/assets/drawable/restau.png'),
+      ),
+    );
+  }
 }
