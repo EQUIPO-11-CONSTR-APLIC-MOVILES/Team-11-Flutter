@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_in_button/sign_in_button.dart';
@@ -14,8 +15,12 @@ class _LogInScreenState extends State<LogInScreen> {
   TextEditingController passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  void attemptSignIn() {
+  void attemptSignIn() async {
     // Handle sign-in logic here
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: userController.text, 
+      password: passwordController.text,
+    );
   }
 
   void signInGoogle() {

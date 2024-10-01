@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:restau/views/auth_screen.dart';
+import 'firebase_options.dart';
 import 'package:flutter/services.dart';
-import 'views/log_in_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const RestaUApp());
 }
 
@@ -20,7 +23,7 @@ class RestaUApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'RestaU',
-      home: LogInScreen(),
+      home: AuthScreen(),
     );
   }
 }

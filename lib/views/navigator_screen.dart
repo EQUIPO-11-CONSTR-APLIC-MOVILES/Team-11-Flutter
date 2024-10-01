@@ -1,15 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../viewmodels/navigator_viewmodel.dart';
 import 'home_screen.dart';
 import 'random_screen.dart';
 import 'search_screen.dart';
 import 'liked_screen.dart';
 import 'map_screen.dart';
-import '../models/firestore_service.dart';
 
-class NavigatorScreen extends StatelessWidget {
+class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({super.key});
+
+  @override
+  _NavigatorScreenState createState() => _NavigatorScreenState();
+}
+
+class _NavigatorScreenState extends State<NavigatorScreen> {
+  int _selectedIndex = 0;
+    
+  final user = FirebaseAuth.instance.currentUser!;
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
@@ -19,49 +26,65 @@ class NavigatorScreen extends StatelessWidget {
     const MapScreen(),
   ];
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  void attemptLogOut(){
+    FirebaseAuth.instance.signOut();
+  }
+  
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => NavigatorViewModel(),
-      child: Consumer<NavigatorViewModel>(
-        builder: (context, viewModel, child) {
-          return Scaffold(
-            body: _widgetOptions.elementAt(viewModel.selectedIndex),
-            bottomNavigationBar: BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              items: <BottomNavigationBarItem>[
-                _buildBottomNavigationBarItem(Icons.home, 'Home', 0, viewModel),
-                _buildBottomNavigationBarItem(Icons.shuffle, 'Random', 1, viewModel),
-                _buildBottomNavigationBarItem(Icons.search, 'Search', 2, viewModel),
-                _buildBottomNavigationBarItem(Icons.favorite, 'Liked', 3, viewModel),
-                _buildBottomNavigationBarItem(Icons.map, 'Map', 4, viewModel),
-              ],
-              currentIndex: viewModel.selectedIndex,
-              selectedItemColor: Colors.black,
-              unselectedItemColor: Colors.black,
-              onTap: viewModel.onItemTapped,
-              showSelectedLabels: false,
-              showUnselectedLabels: false,
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(onPressed: attemptLogOut, icon: const Icon(Icons.logout)),
+        ],
+      ),
+      body: _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        items: List.generate(5, (index) {
+          return BottomNavigationBarItem(
+            icon: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _selectedIndex == index ? const Color(0xFFFFEEAD) : Colors.transparent,
+              ),
+              padding: const EdgeInsets.all(8.0), // Adjust the padding as needed
+              child: Icon(
+                _getIconForIndex(index),
+                color: _selectedIndex == index ? Colors.black : Colors.black54,
+              ),
             ),
+            label: '',
           );
-        },
+        }),
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
       ),
     );
   }
 
-  BottomNavigationBarItem _buildBottomNavigationBarItem(IconData icon, String label, int index, NavigatorViewModel viewModel) {
-    return BottomNavigationBarItem(
-      icon: viewModel.selectedIndex == index
-          ? Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFFFFEEAD),
-              ),
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(icon),
-            )
-          : Icon(icon),
-      label: label,
-    );
+  IconData _getIconForIndex(int index) {
+    switch (index) {
+      case 0:
+        return Icons.home;
+      case 1:
+        return Icons.shuffle;
+      case 2:
+        return Icons.search;
+      case 3:
+        return Icons.favorite;
+      case 4:
+        return Icons.map;
+      default:
+        return Icons.home; // Fallback icon
+    }
   }
 }
