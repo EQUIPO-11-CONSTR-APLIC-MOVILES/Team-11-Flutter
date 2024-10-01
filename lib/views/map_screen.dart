@@ -14,9 +14,6 @@ class MapScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => MapViewModel(),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('MapScreen'),
-        ),
         body: Consumer<MapViewModel>(
           builder: (context, viewModel, child) {
             if (viewModel.state.isCheckingPermissions) {
