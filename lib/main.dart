@@ -14,6 +14,7 @@ class RestaUApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'RestaU',
       home: SplashScreen(),
     );
