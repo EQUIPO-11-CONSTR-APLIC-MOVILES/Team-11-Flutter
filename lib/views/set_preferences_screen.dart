@@ -1,8 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:restau/viewmodels/log_in_viewmodel.dart';
-import 'package:restau/views/navigator_screen.dart';
+import 'package:restau/views/auth_screen.dart';
 
 class SetPreferencesScreen extends StatefulWidget {
   const SetPreferencesScreen({super.key, required this.mail, required this.user, required this.password});
@@ -29,7 +27,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => NavigatorScreen(),
+          builder: (context) => AuthScreen(),
       ),
     ); 
     

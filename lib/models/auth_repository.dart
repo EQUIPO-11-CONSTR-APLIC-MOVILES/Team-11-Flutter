@@ -96,6 +96,26 @@ class AuthRepository {
       print("Error checking email registration: $e");
       return false; // Consider email unregistered if there's an error
     }
+  }
+  
+  Future<Map<String, dynamic>?> getUserInfoByEmail(String email) async {
+    try {
+      // Query the 'users' collection for the given email
+      QuerySnapshot querySnapshot = await _db.collection('users')
+          .where('email', isEqualTo: email)
+          .get();
 
+      // Check if any documents were returned
+      if (querySnapshot.docs.isNotEmpty) {
+        // Return the data of the first user found
+        return querySnapshot.docs.first.data() as Map<String, dynamic>;
+      } else {
+        print('No user found with email: $email');
+        return null; // Return null if no user was found
+      }
+    } catch (e) {
+      print("Error fetching user info: $e");
+      return null; // Return null in case of an error
+    }
   }
 }

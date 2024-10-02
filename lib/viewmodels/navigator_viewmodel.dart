@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:restau/models/firestore_service.dart';
+import 'package:restau/viewmodels/user.dart';
 
 class NavigatorViewModel extends ChangeNotifier {
+
   int _selectedIndex = 0;
   final FirestoreService _firestoreService = FirestoreService();
   String navigationPath = 'Home'; // Initial path is Home

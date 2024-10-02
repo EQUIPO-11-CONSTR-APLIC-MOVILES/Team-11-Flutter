@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:restau/models/auth_repository.dart';
-import 'user.dart'; // Assuming this is a model representing the user
 
 class LogInViewmodel {
   AuthRepository repo = AuthRepository();
