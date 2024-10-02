@@ -30,6 +30,11 @@ class LogInViewmodel {
   final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
   final validCharsRegex = RegExp(r'^[a-zA-Z0-9._-]+$');
+
+  if (password.isEmpty || name.isEmpty || email.isEmpty){
+    return "empty";
+  }
+
   if (email.length > 320 || !emailRegex.hasMatch(email)) {
     return "email";
   }
@@ -43,6 +48,10 @@ class LogInViewmodel {
 }
 
 String checkValidLog(String password, String name) {
+  if (password.isEmpty || name.isEmpty){
+    return "empty";
+  }
+
   final validCharsRegex = RegExp(r'^[a-zA-Z0-9._-]+$');
   if (name.length < 3 || name.length > 32 || !validCharsRegex.hasMatch(name)) {
     return "name";

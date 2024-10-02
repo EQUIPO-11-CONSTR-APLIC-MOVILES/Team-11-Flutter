@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:restau/viewmodels/log_in_viewmodel.dart';
 import 'package:restau/views/log_in_screen.dart';
+import 'package:restau/views/set_preferences_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -67,8 +68,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
             setState(() {
               _errorMessage = "Invalid user.";
             });
+          } else if (ans == "empty"){
+            setState(() {
+              _errorMessage = "Empty fields detected.";
+            });
           } else {
-            Navigator();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SetPreferencesScreen(mail: mailController.text, 
+                    user: userController.text, password: passwordController.text),
+              ),
+            );
           }
           setState(() {
             _errorMessage = "Sign-up failed.";

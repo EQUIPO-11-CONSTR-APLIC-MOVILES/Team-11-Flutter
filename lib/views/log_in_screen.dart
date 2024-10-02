@@ -27,13 +27,17 @@ class _LogInScreenState extends State<LogInScreen> {
     });
 
     final ans = vm.checkValidLog(passwordController.text, userController.text);
-    if (ans == "user"){
+    if (ans == "name"){
       setState(() {
         _errorMessage = "Invalid user.";
       });
     } else if (ans == "password"){
       setState(() {
         _errorMessage = "Invalid user.";
+      });
+    } else if (ans == "empty"){
+      setState(() {
+        _errorMessage = "Empty fields detected.";
       });
     } else {
       vm.logIn(userController.text, passwordController.text);
