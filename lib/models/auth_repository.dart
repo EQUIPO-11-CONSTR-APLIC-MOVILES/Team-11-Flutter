@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 class AuthRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   // Fetch all preferences
   Future<List<Map<String, dynamic>>> getAllPreferences() async {
     try {
-      QuerySnapshot querySnapshot = await _db.collection('Preference Tags').get();
-      return querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+      QuerySnapshot querySnapshot =
+          await _db.collection('Preference Tags').get();
+      return querySnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
     } catch (e) {
       print(e.toString());
       return [];
@@ -64,17 +66,18 @@ class AuthRepository {
     }
   }
 
-  Future<void> registerUserInDB(String mail, String pass, String name, String picture, List<String> preferences) async{
+  Future<void> registerUserInDB(String mail, String pass, String name,
+      String picture, List<String> preferences) async {
     try {
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-    print("User ID: $uid");
-    
-    await _db.collection('users').doc(uid).set({
-      'name': name,
-      'email': mail,
-      'profilePic': picture,
-      'preferences': preferences
-    });
+      String? uid = FirebaseAuth.instance.currentUser?.uid;
+      print("User ID: $uid");
+
+      await _db.collection('users').doc(uid).set({
+        'name': name,
+        'email': mail,
+        'profilePic': picture,
+        'preferences': preferences
+      });
     } catch (e) {
       print("Error registering user: $e");
       if (e is FirebaseException) {
@@ -86,9 +89,8 @@ class AuthRepository {
   Future<bool> isEmailRegistered(String email) async {
     try {
       // Query the 'users' collection for the given email
-      QuerySnapshot querySnapshot = await _db.collection('users')
-          .where('email', isEqualTo: email)
-          .get();
+      QuerySnapshot querySnapshot =
+          await _db.collection('users').where('email', isEqualTo: email).get();
 
       // If any documents are returned, the email is already registered
       return querySnapshot.docs.isNotEmpty;
@@ -97,13 +99,12 @@ class AuthRepository {
       return false; // Consider email unregistered if there's an error
     }
   }
-  
+
   Future<Map<String, dynamic>?> getUserInfoByEmail(String email) async {
     try {
       // Query the 'users' collection for the given email
-      QuerySnapshot querySnapshot = await _db.collection('users')
-          .where('email', isEqualTo: email)
-          .get();
+      QuerySnapshot querySnapshot =
+          await _db.collection('users').where('email', isEqualTo: email).get();
 
       // Check if any documents were returned
       if (querySnapshot.docs.isNotEmpty) {
