@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:restau/viewmodels/log_in_viewmodel.dart';
+import '../viewmodels/navigator_viewmodel.dart';
 import 'home_screen.dart';
 import 'random_screen.dart';
 import 'search_screen.dart';
@@ -18,6 +19,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   int _selectedIndex = 0;
   
   LogInViewmodel livm = LogInViewmodel();
+  NavigatorViewModel vm = NavigatorViewModel();
 
   final user = FirebaseAuth.instance.currentUser!;
 
@@ -29,22 +31,12 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
     const MapScreen(),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  void attemptLogOut(){
-    livm.logOut();
-  }
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(onPressed: attemptLogOut, icon: const Icon(Icons.logout)),
+          IconButton(onPressed: livm.logOut, icon: const Icon(Icons.logout)),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0), // Height of the bottom border
@@ -69,7 +61,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
               ),
               padding: const EdgeInsets.all(8.0), 
               child: Icon(
-                _getIconForIndex(index),
+                vm.getIconForIndex(index),
                 color: _selectedIndex == index ? Colors.black : Colors.black54,
               ),
             ),
@@ -77,27 +69,10 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           );
         }),
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        onTap: vm.onItemTapped,
         showSelectedLabels: false,
         showUnselectedLabels: false,
       ),
     );
-  }
-
-  IconData _getIconForIndex(int index) {
-    switch (index) {
-      case 0:
-        return Icons.home;
-      case 1:
-        return Icons.shuffle;
-      case 2:
-        return Icons.search;
-      case 3:
-        return Icons.favorite;
-      case 4:
-        return Icons.map;
-      default:
-        return Icons.home; // Fallback icon
-    }
   }
 }

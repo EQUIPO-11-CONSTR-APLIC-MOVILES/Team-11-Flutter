@@ -47,14 +47,14 @@ class LogInViewmodel {
   return "valid";
 }
 
-String checkValidLog(String password, String name) {
-  if (password.isEmpty || name.isEmpty){
+String checkValidLog(String password, String email) {
+  if (password.isEmpty || email.isEmpty){
     return "empty";
   }
-
+  final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
   final validCharsRegex = RegExp(r'^[a-zA-Z0-9._-]+$');
-  if (name.length < 3 || name.length > 32 || !validCharsRegex.hasMatch(name)) {
-    return "name";
+  if (email.length > 320 || !emailRegex.hasMatch(email)) {
+    return "email";
   }
   if (password.length < 6 || password.length > 32 || !validCharsRegex.hasMatch(password)) {
     return "password";

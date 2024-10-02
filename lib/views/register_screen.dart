@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:restau/viewmodels/log_in_viewmodel.dart';
+import 'package:restau/views/auth_screen.dart';
 import 'package:restau/views/log_in_screen.dart';
 import 'package:restau/views/set_preferences_screen.dart';
 
@@ -33,7 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => LogInScreen(),
+                builder: (context) => AuthScreen(),
             ),
           );
         }
@@ -137,7 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 SizedBox(height: elementSpacing),
                 TextField(
-                  controller: mailController,
+                  controller: passwordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     hintText: 'Password',
