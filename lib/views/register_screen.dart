@@ -1,76 +1,77 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:restau/viewmodels/log_in_viewmodel.dart';
-import 'package:restau/views/register_screen.dart';
-import 'package:sign_in_button/sign_in_button.dart';
+import 'package:restau/views/auth_screen.dart';
+import 'package:restau/views/set_preferences_screen.dart';
 
-class LogInScreen extends StatefulWidget {
-  const LogInScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LogInScreen> createState() => _LogInScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LogInScreenState extends State<LogInScreen> {
-  LogInViewmodel vm = LogInViewmodel();
-
+class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController mailController = TextEditingController();
+  LogInViewmodel vm = LogInViewmodel();
 
-  bool _obscurePassword = true;
-  String? _errorMessage; 
+  bool obscurePassword = true;
+  String? errorMessage; 
 
-  void attemptSignIn() async {
-    setState(() {
-      _errorMessage = null; 
-    });
-
-    final ans = vm.checkValidLog(passwordController.text, userController.text);
-    if (ans == "name"){
-      setState(() {
-        _errorMessage = "Invalid user.";
-      });
-    } else if (ans == "password"){
-      setState(() {
-        _errorMessage = "Invalid user.";
-      });
-    } else if (ans == "empty"){
-      setState(() {
-        _errorMessage = "Empty fields detected.";
-      });
-    } else {
-      vm.logIn(userController.text, passwordController.text);
-    }
-  }
-
-  void signInGoogle() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      // TODO: remove
-      email: 'a@a.com',
-      password: 'aaaaaa',
-    );
-  }
-
-  void signUp() {
+  void signIn() {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => const RegisterScreen(),
+          builder: (context) => const AuthScreen(),
       ),
     );
   }
 
   void showPassword() {
     setState(() {
-      _obscurePassword = false;
+      obscurePassword = false;
     });
   }
 
   void hidePassword() {
     setState(() {
-      _obscurePassword = true;
+      obscurePassword = true;
     });
+  }
+
+  void attemptSignIn() async {
+    setState(() {
+      errorMessage = null; 
+    });
+
+    final ans = await vm.checkValidNewUser(mailController.text,passwordController.text, userController.text);
+    if (ans == "email"){
+      setState(() {
+        errorMessage = "Invalid email.";
+      });
+    } else if (ans == "password"){
+      setState(() {
+        errorMessage = "Passwords should have between 6 and 32 characters.";
+      });
+    } else if (ans == "user"){
+      setState(() {
+        errorMessage = "Invalid user.";
+      });
+    } else if (ans == "empty"){
+      setState(() {
+        errorMessage = "Empty fields detected.";
+      });
+    } else {
+      Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => SetPreferencesScreen(mail: mailController.text, 
+            user: userController.text, password: passwordController.text),
+      ),
+    );
+    }
   }
 
   @override
@@ -98,7 +99,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 const Row(
                   children: [
                     Text(
-                      "Login",
+                      "Create Account",
                       style: TextStyle(
                         fontFamily: "Poppins",
                         fontSize: 30,
@@ -111,6 +112,18 @@ class _LogInScreenState extends State<LogInScreen> {
                 TextField(
                   controller: userController,
                   decoration: const InputDecoration(
+                    hintText: 'Name',
+                    hintStyle: TextStyle(fontFamily: "Poppins"),
+                    prefixIcon: Icon(Icons.account_circle_outlined, color: Colors.black),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                  ),
+                ),
+                SizedBox(height: elementSpacing),
+                TextField(
+                  controller: mailController,
+                  decoration: const InputDecoration(
                     hintText: 'Email',
                     hintStyle: TextStyle(fontFamily: "Poppins"),
                     prefixIcon: Icon(Icons.mail_outline, color: Colors.black),
@@ -122,7 +135,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 SizedBox(height: elementSpacing),
                 TextField(
                   controller: passwordController,
-                  obscureText: _obscurePassword,
+                  obscureText: obscurePassword,
                   decoration: InputDecoration(
                     hintText: 'Password',
                     hintStyle: const TextStyle(fontFamily: 'Poppins'),
@@ -148,13 +161,13 @@ class _LogInScreenState extends State<LogInScreen> {
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.all(const Color(0xFFD9534F)),
                     ),
-                    child: const Text('Sign In'),
+                    child: const Text('Sign Up'),
                   ),
                 ),
                 // Error message shown if sign-in fails
-                if (_errorMessage != null) ...[
+                if (errorMessage != null) ...[
                   Text(
-                    _errorMessage!,
+                    errorMessage!,
                     style: const TextStyle(
                       color: Colors.red,
                       fontFamily: 'Poppins',
@@ -163,24 +176,12 @@ class _LogInScreenState extends State<LogInScreen> {
                   ),
                 ],
                 SizedBox(height: elementSpacing),
-                const Text.rich(TextSpan(
-                  text: '────────── ', // default text style
-                  children: <TextSpan>[
-                    TextSpan(text: ' OR ', style: TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.bold)),
-                    TextSpan(text: ' ──────────'),
-                  ],
-                )),
-                SizedBox(height: elementSpacing),
-                SignInButton(
-                  Buttons.google,
-                  onPressed: signInGoogle,
-                ),
                 const Spacer(), // Pushes the "Sign Up" to the bottom
                 Text.rich(
                   TextSpan(
                     children: <TextSpan>[
                       const TextSpan(
-                        text: 'Don\'t have an account? ',
+                        text: 'Already have an account? ',
                         style: TextStyle(
                           fontFamily: "Poppins",
                           color: Color(0xFFB1B1B1),
@@ -188,7 +189,7 @@ class _LogInScreenState extends State<LogInScreen> {
                         ),
                       ),
                       TextSpan(
-                        text: 'Sign Up',
+                        text: 'Sign In',
                         style: const TextStyle(
                           fontFamily: "Poppins",
                           color: Color(0xFFD9534F),
@@ -196,7 +197,7 @@ class _LogInScreenState extends State<LogInScreen> {
                           fontSize: 15,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = signUp, // Call the signUp function when tapped
+                          ..onTap = signIn, // Call the signUp function when tapped
                       ),
                     ],
                   ),

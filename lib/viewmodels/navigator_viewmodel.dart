@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:restau/models/firestore_service.dart';
+import 'package:restau/viewmodels/user.dart';
 
 class NavigatorViewModel extends ChangeNotifier {
+
   int _selectedIndex = 0;
   final FirestoreService _firestoreService = FirestoreService();
   String navigationPath = 'Home'; // Initial path is Home
@@ -47,5 +49,22 @@ class NavigatorViewModel extends ChangeNotifier {
 
   void updateNavigationPathInFirestore() {
     _firestoreService.updateNavigationPath(sessionId, navigationPath);
+  }
+
+  IconData getIconForIndex(int index) {
+    switch (index) {
+      case 0:
+        return Icons.home;
+      case 1:
+        return Icons.shuffle;
+      case 2:
+        return Icons.search;
+      case 3:
+        return Icons.favorite;
+      case 4:
+        return Icons.map;
+      default:
+        return Icons.home; // Fallback icon
+    }
   }
 }

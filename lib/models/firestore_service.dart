@@ -21,6 +21,7 @@ class FirestoreService {
       });
       return docRef.id;
     } catch (e) {
+      // TODO: No imprimir
       print(e.toString());
       return "";
     }
