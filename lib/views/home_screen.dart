@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:restau/models/restaurant.dart';
+import 'package:restau/viewmodels/user.dart';
 import 'package:restau/widgets/restaurant_card/restaurant_list.dart';
 import '../models/firestore_service.dart';
 import 'package:intl/intl.dart';
@@ -15,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final FirestoreService firestoreService = FirestoreService();
-
+  final User user = User();
   final Timestamp now = Timestamp.now();
 
   // Function to get the current day name (e.g., "monday")
@@ -34,8 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
 
   // This function filters the restaurants based on the selected button
-  List<Restaurant> filterRestaurants(
-      List<Restaurant> restaurants, int selectedIndex) {
+  List<Restaurant> filterRestaurants(List<Restaurant> restaurants,
+      int selectedIndex, Map<String, dynamic> userInfo) {
     if (selectedIndex == 1) {
       // "Open Now" filter logic
       final currentDay = getCurrentDay();
@@ -55,9 +57,13 @@ class _HomeScreenState extends State<HomeScreen> {
         return false;
       }).toList();
     } else if (selectedIndex == 2) {
-      // Filter for "For You" logic (e.g., personalized recommendations)
+      final List<String> userPreferences =
+          userInfo['preferences'].cast<String>();
       return restaurants.where((restaurant) {
-        return true; // Replace with "for you" condition
+        final restaurantCategories = restaurant.categories;
+        return restaurantCategories.any((category) {
+          return userPreferences.contains(category);
+        });
       }).toList();
     }
     // If "All" is selected, return all restaurants
@@ -93,21 +99,24 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<Map<String, dynamic>>?>(
-        future: firestoreService.getAllRestaurants(),
+      body: FutureBuilder<List<dynamic>>(
+        future: Future.wait([
+          firestoreService.getAllRestaurants(),
+          user.getUserInfo(),
+        ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No restaurants found'));
+            return const Center(child: Text('No data found'));
           } else {
-            final restaurants = snapshot.data!;
+            final restaurants = snapshot.data![0] as List<Map<String, dynamic>>;
+            final userInfo = snapshot.data![1] as Map<String, dynamic>;
             final _registeredRestaurants = castToRestaurantList(restaurants);
-            final filteredRestaurants =
-                filterRestaurants(_registeredRestaurants, selectedIndex);
-
+            final filteredRestaurants = filterRestaurants(
+                _registeredRestaurants, selectedIndex, userInfo);
             return Column(
               children: [
                 // Buttons Row
