@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:restau/models/map_state.dart';
+import 'package:restau/models/restaurant.dart';
 
 class CustomInfoWindow extends StatelessWidget {
   final Restaurant restaurant;
