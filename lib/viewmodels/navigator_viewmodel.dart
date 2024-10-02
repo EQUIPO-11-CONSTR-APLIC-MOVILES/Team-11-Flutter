@@ -54,15 +54,15 @@ class NavigatorViewModel extends ChangeNotifier {
   IconData getIconForIndex(int index) {
     switch (index) {
       case 0:
-        return Icons.home;
+        return Icons.restaurant;
       case 1:
         return Icons.shuffle;
       case 2:
         return Icons.search;
       case 3:
-        return Icons.favorite;
+        return Icons.favorite_border;
       case 4:
-        return Icons.map;
+        return Icons.location_on_outlined;
       default:
         return Icons.home; // Fallback icon
     }
