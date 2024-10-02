@@ -5,6 +5,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  // Fetch all preferences
+  Future<List<Map<String, dynamic>>> getAllPreferences() async {
+    try {
+      QuerySnapshot querySnapshot = await _db.collection('Preference Tags').get();
+      return querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    } catch (e) {
+      print(e.toString());
+      return [];
+    }
+  }
+
   Future<void> logIn(String username, String password) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -37,24 +48,54 @@ class AuthRepository {
     return FirebaseAuth.instance.currentUser?.email;
   }
 
-  Future<void> registerUser(String email, String password, String name, String picture, List<String> preferences) async {
+  Future<void> registerUserInAuth(String mail, String pass) async {
+    print('si');
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
+      print("Attempting to create user with email: $mail and password: $pass");
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: mail,
+        password: pass,
       );
-
-      String uid = userCredential.user!.uid;
-
-      await _db.collection('users').doc(uid).set({
-        'name': name,
-        'email': email,
-        'picture': picture,
-        'preferences': preferences,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
     } catch (e) {
       print("Error registering user: $e");
+      if (e is FirebaseException) {
+        print("FirebaseException: ${e.message}");
+      }
     }
+  }
+
+  Future<void> registerUserInDB(String mail, String pass, String name, String picture, List<String> preferences) async{
+    try {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    print("User ID: $uid");
+    
+    await _db.collection('users').doc(uid).set({
+      'name': name,
+      'email': mail,
+      'profilePic': picture,
+      'preferences': preferences
+    });
+    } catch (e) {
+      print("Error registering user: $e");
+      if (e is FirebaseException) {
+        print("FirebaseException: ${e.message}");
+      }
+    }
+  }
+
+  Future<bool> isEmailRegistered(String email) async {
+    try {
+      // Query the 'users' collection for the given email
+      QuerySnapshot querySnapshot = await _db.collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      // If any documents are returned, the email is already registered
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      print("Error checking email registration: $e");
+      return false; // Consider email unregistered if there's an error
+    }
+
   }
 }

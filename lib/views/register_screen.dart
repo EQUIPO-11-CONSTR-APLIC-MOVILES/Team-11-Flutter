@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:restau/viewmodels/log_in_viewmodel.dart';
 import 'package:restau/views/auth_screen.dart';
-import 'package:restau/views/log_in_screen.dart';
 import 'package:restau/views/set_preferences_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -18,6 +17,63 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController mailController = TextEditingController();
   LogInViewmodel vm = LogInViewmodel();
 
+  bool obscurePassword = true;
+  String? errorMessage; 
+
+  void signIn() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => const AuthScreen(),
+      ),
+    );
+  }
+
+  void showPassword() {
+    setState(() {
+      obscurePassword = false;
+    });
+  }
+
+  void hidePassword() {
+    setState(() {
+      obscurePassword = true;
+    });
+  }
+
+  void attemptSignIn() async {
+    setState(() {
+      errorMessage = null; 
+    });
+
+    final ans = await vm.checkValidNewUser(mailController.text,passwordController.text, userController.text);
+    if (ans == "email"){
+      setState(() {
+        errorMessage = "Invalid email.";
+      });
+    } else if (ans == "password"){
+      setState(() {
+        errorMessage = "Passwords should have between 6 and 32 characters.";
+      });
+    } else if (ans == "user"){
+      setState(() {
+        errorMessage = "Invalid user.";
+      });
+    } else if (ans == "empty"){
+      setState(() {
+        errorMessage = "Empty fields detected.";
+      });
+    } else {
+      Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => SetPreferencesScreen(mail: mailController.text, 
+            user: userController.text, password: passwordController.text),
+      ),
+    );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -26,66 +82,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         double screenHeight = constraints.maxHeight;
         double imageSize = 0.3 * screenWidth;
         double elementSpacing = 0.04 * screenHeight;
-        
-        bool _obscurePassword = true;
-        String? _errorMessage; 
-
-        void signIn() {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AuthScreen(),
-            ),
-          );
-        }
-
-        void showPassword() {
-          setState(() {
-            _obscurePassword = false;
-          });
-        }
-
-        void hidePassword() {
-          setState(() {
-            _obscurePassword = true;
-          });
-        }
-
-        void attemptSignIn() async {
-          setState(() {
-            _errorMessage = null; 
-          });
-
-          final ans = vm.checkValidUser(mailController.text, userController.text,passwordController.text);
-          if (ans == "email"){
-            setState(() {
-              _errorMessage = "Invalid email.";
-            });
-          } else if (ans == "password"){
-            setState(() {
-              _errorMessage = "Passwords should have between 6 and 32 characters.";
-            });
-          } else if (ans == "user"){
-            setState(() {
-              _errorMessage = "Invalid user.";
-            });
-          } else if (ans == "empty"){
-            setState(() {
-              _errorMessage = "Empty fields detected.";
-            });
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => SetPreferencesScreen(mail: mailController.text, 
-                    user: userController.text, password: passwordController.text),
-              ),
-            );
-          }
-          setState(() {
-            _errorMessage = "Sign-up failed.";
-          });
-        }
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -139,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: elementSpacing),
                 TextField(
                   controller: passwordController,
-                  obscureText: _obscurePassword,
+                  obscureText: obscurePassword,
                   decoration: InputDecoration(
                     hintText: 'Password',
                     hintStyle: const TextStyle(fontFamily: 'Poppins'),
@@ -165,13 +161,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.all(const Color(0xFFD9534F)),
                     ),
-                    child: const Text('Sign In'),
+                    child: const Text('Sign Up'),
                   ),
                 ),
                 // Error message shown if sign-in fails
-                if (_errorMessage != null) ...[
+                if (errorMessage != null) ...[
                   Text(
-                    _errorMessage!,
+                    errorMessage!,
                     style: const TextStyle(
                       color: Colors.red,
                       fontFamily: 'Poppins',
