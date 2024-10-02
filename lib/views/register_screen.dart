@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:restau/viewmodels/log_in_viewmodel.dart';
 import 'package:restau/views/log_in_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController mailController = TextEditingController();
+  LogInViewmodel vm = LogInViewmodel();
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         double screenHeight = constraints.maxHeight;
         double imageSize = 0.3 * screenWidth;
         double elementSpacing = 0.04 * screenHeight;
-
+        
         bool _obscurePassword = true;
         String? _errorMessage; 
 
@@ -52,11 +54,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
             _errorMessage = null; 
           });
 
-          //vm.logIn(userController.text, passwordController.text);
-
-          await Future.delayed(const Duration(seconds: 1));
+          final ans = vm.checkValidUser(mailController.text, userController.text,passwordController.text);
+          if (ans == "email"){
+            setState(() {
+              _errorMessage = "Invalid email.";
+            });
+          } else if (ans == "password"){
+            setState(() {
+              _errorMessage = "Passwords should have between 6 and 32 characters.";
+            });
+          } else if (ans == "user"){
+            setState(() {
+              _errorMessage = "Invalid user.";
+            });
+          } else {
+            Navigator();
+          }
           setState(() {
-            _errorMessage = "Sign-in failed.";
+            _errorMessage = "Sign-up failed.";
           });
         }
 

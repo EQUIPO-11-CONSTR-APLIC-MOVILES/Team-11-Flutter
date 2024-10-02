@@ -26,12 +26,18 @@ class _LogInScreenState extends State<LogInScreen> {
       _errorMessage = null; 
     });
 
-    vm.logIn(userController.text, passwordController.text);
-
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() {
-      _errorMessage = "Sign-in failed.";
-    });
+    final ans = vm.checkValidLog(passwordController.text, userController.text);
+    if (ans == "user"){
+      setState(() {
+        _errorMessage = "Invalid user.";
+      });
+    } else if (ans == "password"){
+      setState(() {
+        _errorMessage = "Invalid user.";
+      });
+    } else {
+      vm.logIn(userController.text, passwordController.text);
+    }
   }
 
   void signInGoogle() async {
