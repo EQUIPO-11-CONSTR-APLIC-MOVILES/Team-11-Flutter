@@ -4,6 +4,7 @@ import 'package:location/location.dart' as location_pkg;
 import 'package:permission_handler/permission_handler.dart' as permission_handler_pkg;
 import 'package:restau/models/map_state.dart';
 import '../models/firestore_service.dart';
+import 'package:restau/models/restaurant.dart';
 
 class MapViewModel extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
