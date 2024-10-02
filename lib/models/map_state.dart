@@ -1,5 +1,5 @@
-import 'dart:math';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:restau/models/restaurant.dart';
 
 class MapState {
   final LatLng userLocation;
@@ -38,53 +38,5 @@ class MapState {
       circleRadius: circleRadius ?? this.circleRadius,
       isCheckingPermissions: isCheckingPermissions ?? this.isCheckingPermissions,
     );
-  }
-}
-
-class Restaurant {
-  final String name;
-  final LatLng location;
-  double distance;
-  final double averageRating;
-  final String imageUrl;
-
-  Restaurant({
-    required this.name,
-    required this.location,
-    this.distance = 0.0,
-    required this.averageRating,
-    required this.imageUrl,
-  });
-
-  factory Restaurant.fromMap(Map<String, dynamic> data) {
-    double rating;
-    if (data['averageRating'] is int) {
-      rating = (data['averageRating'] as int).toDouble();
-    } else {
-      rating = data['averageRating'];
-    }
-
-    return Restaurant(
-      name: data['name'],
-      location: LatLng(data['latitude'], data['longitude']),
-      averageRating: rating,
-      imageUrl: data['imageUrl'],
-    );
-  }
-
-  void calculateDistance(LatLng userLocation) {
-    const double earthRadius = 6371; // km
-    final double dLat = _degToRad(location.latitude - userLocation.latitude);
-    final double dLon = _degToRad(location.longitude - userLocation.longitude);
-    final double a = 
-      sin(dLat / 2) * sin(dLat / 2) +
-      cos(_degToRad(userLocation.latitude)) * cos(_degToRad(location.latitude)) *
-      sin(dLon / 2) * sin(dLon / 2);
-    final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    distance = earthRadius * c;
-  }
-
-  double _degToRad(double deg) {
-    return deg * (pi / 180);
   }
 }
