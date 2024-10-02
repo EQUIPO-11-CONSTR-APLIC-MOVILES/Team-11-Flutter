@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:restau/models/restaurant.dart';
 import 'package:restau/viewmodels/map_viewmodel.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:restau/widgets/info_window.dart';
+import 'package:restau/models/restaurant_marker_adapter.dart';
 
 class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
@@ -97,28 +96,10 @@ class MapScreen extends StatelessWidget {
         ),
       },
       markers: viewModel.state.nearRestaurants.map((restaurant) {
-        return Marker(
-          markerId: MarkerId(restaurant.name),
-          position: LatLng(restaurant.latitude, restaurant.longitude),
-          icon: _selectIcon(restaurant),
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  content: CustomInfoWindow(restaurant: restaurant),
-                );
-              },
-            );
-          },
-        );
+        RestaurantMarkerAdapter adapter = RestaurantMarkerAdapter(restaurant: restaurant, context: context);
+        return adapter.toMarker();
       }).toSet(),
     );
-  }
-
-  BitmapDescriptor _selectIcon(Restaurant restaurant) {
-    // TODO: If new, return a custom
-    return BitmapDescriptor.defaultMarker;
   }
 
   Widget _slider(MapViewModel viewModel) {
