@@ -14,11 +14,11 @@ class MapViewModel extends ChangeNotifier {
   bool _initialLocationSet = false;
 
   MapViewModel() {
-    _requestPermission();
+    requestPermission();
     fetchRestaurants();
   }
 
-  Future<void> _requestPermission() async {
+  Future<void> requestPermission() async {
     bool serviceEnabled;
     location_pkg.PermissionStatus permissionGranted;
 

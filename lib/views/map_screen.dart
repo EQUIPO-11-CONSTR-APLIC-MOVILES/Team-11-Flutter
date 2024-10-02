@@ -4,14 +4,53 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:restau/viewmodels/map_viewmodel.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:restau/models/restaurant_marker_adapter.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-class MapScreen extends StatelessWidget {
+class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
+
+  @override
+  MapScreenState createState() => MapScreenState();
+}
+
+class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
+  late MapViewModel viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this); // Add observer to listen for app state changes
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // Clean up the observer when the widget is disposed
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // When the app resumes, check for permissions again
+      _checkPermissions();
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  Future<void> _checkPermissions() async {
+    final status = await Permission.locationWhenInUse.status;
+    if (status.isGranted) {
+      viewModel.requestPermission(); // Update the viewModel when permissions are granted
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => MapViewModel(),
+      create: (_) {
+        viewModel = MapViewModel();
+        return viewModel;
+      },
       child: Scaffold(
         body: Consumer<MapViewModel>(
           builder: (context, viewModel, child) {
@@ -149,5 +188,4 @@ class MapScreen extends StatelessWidget {
       ),
     );
   }
-
 }
