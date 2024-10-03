@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:restau/models/firestore_service.dart';
+import 'package:restau/models/restaurant.dart';
+import 'package:restau/widgets/restaurant_card/restaurant_list.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class SearchScreen extends StatefulWidget {
@@ -14,6 +17,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Timer? _debounce;
   late stt.SpeechToText _speech;
   bool _isListening = false;
+  final FirestoreService firestoreService = FirestoreService();
 
   @override
   void initState() {
@@ -45,7 +49,18 @@ class _SearchScreenState extends State<SearchScreen> {
           if (val == 'notListening') {
             setState(() => _isListening = false);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Stopped listening')),
+              const SnackBar(
+                content: Center(
+                  child: Text(
+                    'Stopped listening',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                backgroundColor: Color(0xE6FFEEAD),
+              ),
             );
           }
         },
@@ -60,7 +75,18 @@ class _SearchScreenState extends State<SearchScreen> {
           }),
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Listening...')),
+          const SnackBar(
+            content: Center(
+              child: Text(
+                'Listening...',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            backgroundColor: Color(0xE6FFEEAD),
+          ),
         );
       }
     } else {
@@ -72,43 +98,77 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  // Function to cast restaurant data to List<Restaurant>
+  List<Restaurant> castToRestaurantList(
+      List<Map<String, dynamic>> snapshotData) {
+    return snapshotData.map((restaurantData) {
+      return Restaurant(
+        averageRating: restaurantData['averageRating'],
+        categories: List<String>.from(restaurantData['categories']),
+        imageUrl: restaurantData['imageUrl'],
+        latitude: restaurantData['latitude'],
+        longitude: restaurantData['longitude'],
+        name: restaurantData['name'],
+        openingDate: restaurantData['openingDate'],
+        placeName: restaurantData['placeName'],
+        schedule:
+            Map<String, Map<String, dynamic>>.from(restaurantData['schedule']),
+      );
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Search'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _searchController,
-              onChanged: (text) => _onSearchChanged(),
-              decoration: InputDecoration(
-                labelText: 'Search for restaurants',
-                labelStyle: const TextStyle(color: Colors.grey),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+      body: FutureBuilder<List<dynamic>>(
+        future: Future.wait([
+          firestoreService.getAllRestaurants(),
+        ]),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No data found'));
+          } else {
+            final restaurants = snapshot.data![0] as List<Map<String, dynamic>>;
+            final registeredRestaurants = castToRestaurantList(restaurants);
+            return Column(
+              children: [
+                TextField(
+                  controller: _searchController,
+                  onChanged: (text) => _onSearchChanged(),
+                  decoration: InputDecoration(
+                    labelText: 'Search for restaurants',
+                    labelStyle: const TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: const BorderSide(color: Colors.grey),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 15, 14, 14)),
+                    ),
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: IconButton(
+                      icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
+                      onPressed: _listen,
+                    ),
+                  ),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  borderSide: const BorderSide(color: Colors.grey),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: RestaurantList(restaurants: registeredRestaurants),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  borderSide:
-                      const BorderSide(color: Color.fromARGB(255, 15, 14, 14)),
-                ),
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: IconButton(
-                  icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
-                  onPressed: _listen,
-                ),
-              ),
-            ),
-          ],
-        ),
+              ],
+            );
+          }
+        },
       ),
     );
   }

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:restau/models/restaurant.dart';
 import 'package:restau/viewmodels/user.dart';
@@ -114,9 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
           } else {
             final restaurants = snapshot.data![0] as List<Map<String, dynamic>>;
             final userInfo = snapshot.data![1] as Map<String, dynamic>;
-            final _registeredRestaurants = castToRestaurantList(restaurants);
+            final registeredRestaurants = castToRestaurantList(restaurants);
             final filteredRestaurants = filterRestaurants(
-                _registeredRestaurants, selectedIndex, userInfo);
+                registeredRestaurants, selectedIndex, userInfo);
             return Column(
               children: [
                 // Buttons Row
