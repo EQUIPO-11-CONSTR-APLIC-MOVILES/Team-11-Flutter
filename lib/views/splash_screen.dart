@@ -16,7 +16,7 @@ class SplashScreenState extends State<SplashScreen> {
   }
 
   void _navigateToNextScreen() async {
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const NavigatorScreen()),
@@ -26,9 +26,18 @@ class SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: RadialGradient(
+          colors: [
+            Color(0xFFFFAD60),
+            Color(0xFFD9534F),
+          ],
+          radius: 0.85,
+        ),
+      ),
+      child: Center(
+        child: Image.asset('lib/assets/drawable/restau.png'),
       ),
     );
   }

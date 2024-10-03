@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../viewmodels/navigator_viewmodel.dart';
+import 'package:provider/provider.dart';  // Add provider package
+import 'package:restau/viewmodels/log_in_viewmodel.dart';
+import 'package:restau/viewmodels/user.dart';
+import '../viewmodels/navigator_viewmodel.dart'; 
 import 'home_screen.dart';
 import 'random_screen.dart';
 import 'search_screen.dart';
 import 'liked_screen.dart';
 import 'map_screen.dart';
 
-class NavigatorScreen extends StatelessWidget {
+class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({super.key});
+
+  @override
+  NavigatorScreenState createState() => NavigatorScreenState();
+}
+
+class NavigatorScreenState extends State<NavigatorScreen> {
+  
+  User activeUser = User();
+  LogInViewmodel livm = LogInViewmodel();
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
@@ -20,47 +31,113 @@ class NavigatorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Wrap the whole widget with ChangeNotifierProvider if not already done at a higher level
     return ChangeNotifierProvider(
-      create: (_) => NavigatorViewModel(),
-      child: Consumer<NavigatorViewModel>(
-        builder: (context, viewModel, child) {
-          return Scaffold(
-            body: _widgetOptions.elementAt(viewModel.selectedIndex),
-            bottomNavigationBar: BottomNavigationBar(
+      create: (context) => NavigatorViewModel(),
+      child: Scaffold(
+        appBar: AppBar(
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: FutureBuilder<String?>(
+                future: activeUser.getUserPic(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return const Icon(Icons.error);
+                  }
+
+                  String? profilePicUrl = snapshot.data;
+
+                  return GestureDetector(
+                    onTap: () => _showLogoutMenu(context),
+                    child: CircleAvatar(
+                      backgroundImage: profilePicUrl != null
+                          ? NetworkImage(profilePicUrl)
+                          : null,
+                      radius: 20,
+                      child: profilePicUrl == null
+                          ? const Icon(Icons.person)
+                          : null,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1.0),
+            child: Container(
+              color: Colors.black,
+              height: 1.0,
+            ),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          // Listen to changes in the selectedIndex from the NavigatorViewModel
+          child: Consumer<NavigatorViewModel>(
+            builder: (context, vm, child) {
+              return _widgetOptions.elementAt(vm.selectedIndex);
+            },
+          ),
+        ),
+        bottomNavigationBar: Consumer<NavigatorViewModel>(
+          builder: (context, vm, child) {
+            return BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
-              items: <BottomNavigationBarItem>[
-                _buildBottomNavigationBarItem(Icons.home, 'Home', 0, viewModel),
-                _buildBottomNavigationBarItem(Icons.shuffle, 'Random', 1, viewModel),
-                _buildBottomNavigationBarItem(Icons.search, 'Search', 2, viewModel),
-                _buildBottomNavigationBarItem(Icons.favorite, 'Liked', 3, viewModel),
-                _buildBottomNavigationBarItem(Icons.map, 'Map', 4, viewModel),
-              ],
-              currentIndex: viewModel.selectedIndex,
-              selectedItemColor: Colors.black,
-              unselectedItemColor: Colors.black,
-              onTap: viewModel.onItemTapped,
+              items: List.generate(5, (index) {
+                return BottomNavigationBarItem(
+                  icon: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: vm.selectedIndex == index
+                          ? const Color(0xFFFFEEAD)
+                          : Colors.transparent,
+                    ),
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      vm.getIconForIndex(index),
+                      color: Colors.black,
+                    ),
+                  ),
+                  label: '',
+                );
+              }),
+              currentIndex: vm.selectedIndex,
+              onTap: vm.onItemTapped,
               showSelectedLabels: false,
               showUnselectedLabels: false,
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
 
-  BottomNavigationBarItem _buildBottomNavigationBarItem(IconData icon, String label, int index, NavigatorViewModel viewModel) {
-    return BottomNavigationBarItem(
-      icon: viewModel.selectedIndex == index
-          ? Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFFFFEEAD),
-              ),
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(icon),
-            )
-          : Icon(icon),
-      label: label,
-    );
+  void _showLogoutMenu(BuildContext context) {
+    showMenu(
+      context: context,
+      position: const RelativeRect.fromLTRB(100, 80, 0, 0),
+      items: [
+        const PopupMenuItem<String>(
+          value: 'logout',
+          child: Row(
+            children: [
+              Icon(Icons.logout),
+              SizedBox(width: 8),
+              Text('Log Out'),
+            ],
+          ),
+        ),
+      ],
+    ).then((value) {
+      if (value == 'logout') {
+        livm.logOut();
+        // Optionally, navigate to the login screen or show a snackbar
+      }
+    });
   }
 }
