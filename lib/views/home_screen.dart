@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:restau/models/restaurant.dart';
-import 'package:restau/viewmodels/user_viewmodel.dart';
+import 'package:restau/navigation/user_viewmodel.dart';
 import 'package:restau/widgets/restaurant_card/restaurant_list.dart';
 import '../models/firestore_service.dart';
 import 'package:intl/intl.dart';

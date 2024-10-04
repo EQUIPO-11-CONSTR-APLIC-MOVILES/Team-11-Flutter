@@ -1,7 +1,15 @@
-import 'package:restau/models/auth_repository.dart';
+import 'package:restau/auth/auth_repository.dart';
 
 class LogInViewmodel {
   AuthRepository repo = AuthRepository();
+
+  LogInViewmodel._privateConstructor();
+
+  static final LogInViewmodel _instance = LogInViewmodel._privateConstructor();
+  
+  factory LogInViewmodel() {
+    return _instance;
+  }
 
   void logIn(String username, String password) {
     repo.logIn(username, password);

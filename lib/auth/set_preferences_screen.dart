@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:restau/viewmodels/register_viewmodel.dart';
-import 'package:restau/views/auth_screen.dart';
+import 'package:restau/auth/register_viewmodel.dart';
+import 'package:restau/auth/auth_screen.dart';
 
 class SetPreferencesScreen extends StatefulWidget {
   const SetPreferencesScreen({super.key, required this.mail, required this.user, required this.password});

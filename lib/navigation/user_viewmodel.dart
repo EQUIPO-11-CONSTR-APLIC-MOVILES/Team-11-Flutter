@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:restau/models/auth_repository.dart';
+import 'package:restau/auth/auth_repository.dart';
 
 class UserViewModel {
   final AuthRepository repo = AuthRepository();
@@ -7,7 +7,7 @@ class UserViewModel {
   UserViewModel._privateConstructor();
 
   static final UserViewModel _instance = UserViewModel._privateConstructor();
-  
+
   factory UserViewModel() {
     return _instance;
   }

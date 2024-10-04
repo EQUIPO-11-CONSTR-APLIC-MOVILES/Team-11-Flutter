@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:restau/models/auth_repository.dart';
-import 'package:restau/viewmodels/log_in_viewmodel.dart';
+import 'package:restau/auth/auth_repository.dart';
+import 'package:restau/auth/log_in_viewmodel.dart';
 
 class RegisterViewModel {
   AuthRepository repo = AuthRepository();

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as location_pkg;
 import 'package:permission_handler/permission_handler.dart' as permission_handler_pkg;
-import 'package:restau/models/map_state.dart';
+import 'package:restau/map/map_state.dart';
 import '../models/firestore_service.dart';
 import 'package:restau/models/restaurant.dart';
 

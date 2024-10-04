@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';  // Add provider package
-import 'package:restau/viewmodels/log_in_viewmodel.dart';
-import 'package:restau/viewmodels/user_viewmodel.dart';
-import '../viewmodels/navigator_viewmodel.dart'; 
-import 'home_screen.dart';
-import 'random_screen.dart';
-import 'search_screen.dart';
-import 'liked_screen.dart';
-import 'map_screen.dart';
+import 'package:restau/auth/log_in_viewmodel.dart';
+import 'package:restau/navigation/user_viewmodel.dart';
+import 'navigator_viewmodel.dart'; 
+import '../views/home_screen.dart';
+import '../views/random_screen.dart';
+import '../views/search_screen.dart';
+import '../views/liked_screen.dart';
+import '../map/map_screen.dart';
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({super.key});
