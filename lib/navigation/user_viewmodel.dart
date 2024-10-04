@@ -1,8 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:restau/models/auth_repository.dart';
+import 'package:restau/auth/auth_repository.dart';
 
-class User {
+class UserViewModel {
   final AuthRepository repo = AuthRepository();
+
+  UserViewModel._privateConstructor();
+
+  static final UserViewModel _instance = UserViewModel._privateConstructor();
+
+  factory UserViewModel() {
+    return _instance;
+  }
 
   Future<String?> getUserPic() async {
     String? email = FirebaseAuth.instance.currentUser?.email;

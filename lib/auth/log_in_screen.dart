@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:restau/viewmodels/log_in_viewmodel.dart';
-import 'package:restau/views/register_screen.dart';
+import 'package:restau/auth/log_in_viewmodel.dart';
+import 'package:restau/auth/register_screen.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -47,7 +47,7 @@ class _LogInScreenState extends State<LogInScreen> {
   void signInGoogle() async {
     await FirebaseAuth.instance.signInWithEmailAndPassword(
       // TODO: remove
-      email: 'a@a.com',
+      email: 's.chamie@uniandes.edu.co',
       password: 'aaaaaa',
     );
   }

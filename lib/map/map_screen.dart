@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:restau/viewmodels/map_viewmodel.dart';
+import 'package:restau/map/map_viewmodel.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:restau/models/restaurant_marker_adapter.dart';
+import 'package:restau/map/restaurant_marker_adapter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class MapScreen extends StatefulWidget {

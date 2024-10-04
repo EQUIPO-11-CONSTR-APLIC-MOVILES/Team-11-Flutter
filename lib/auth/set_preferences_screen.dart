@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:restau/viewmodels/log_in_viewmodel.dart';
-import 'package:restau/views/auth_screen.dart';
+import 'package:restau/auth/register_viewmodel.dart';
+import 'package:restau/auth/auth_screen.dart';
 
 class SetPreferencesScreen extends StatefulWidget {
   const SetPreferencesScreen({super.key, required this.mail, required this.user, required this.password});
@@ -15,7 +15,7 @@ class SetPreferencesScreen extends StatefulWidget {
 
 class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
   String? _errorMessage;
-  final LogInViewmodel vm = LogInViewmodel();
+  final RegisterViewModel vm = RegisterViewModel();
   
   // A set to keep track of selected preferences
   Set<String> selectedPreferences = {};
@@ -27,7 +27,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => AuthScreen(),
+          builder: (context) => const AuthScreen(),
       ),
     ); 
     

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:restau/models/firestore_service.dart';
-import 'package:restau/viewmodels/user.dart';
 
 class NavigatorViewModel extends ChangeNotifier {
 

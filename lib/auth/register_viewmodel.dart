@@ -1,8 +1,10 @@
 import 'dart:math';
-import 'package:restau/models/auth_repository.dart';
+import 'package:restau/auth/auth_repository.dart';
+import 'package:restau/auth/log_in_viewmodel.dart';
 
-class LogInViewmodel {
+class RegisterViewModel {
   AuthRepository repo = AuthRepository();
+  LogInViewmodel vm = LogInViewmodel();
 
   final List<String> _profilePics = [
     "https://firebasestorage.googleapis.com/v0/b/restau-5dba7.appspot.com/o/profilePics%2Falien.png?alt=media&token=741eaac3-c4a5-4753-9293-9f40826dbc0d",
@@ -13,39 +15,14 @@ class LogInViewmodel {
   ];
 
   void logIn(String username, String password) {
-    repo.logIn(username, password);
-  }
-
-  void logOut() {
-    repo.logOut();
+    vm.logIn(username, password);
   }
 
   void registerUser(String email, String user, String password, List<String> preferences) {
     String randomProfilePic = _profilePics[Random().nextInt(_profilePics.length)];
     repo.registerUserInAuth(email, password);
-    repo.logIn(email, password);
+    logIn(email, password);
     repo.registerUserInDB(email, password, user, randomProfilePic, preferences);
-  }
-
-  String checkValidUser(String email, String password, String name) {
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-
-    final validCharsRegex = RegExp(r'^[a-zA-Z0-9._-]+$');
-
-    if (password.isEmpty || name.isEmpty || email.isEmpty){
-      return "empty";
-    }
-
-    if (email.length > 320 || !emailRegex.hasMatch(email)) {
-      return "email";
-    }
-    if (name.length < 3 || name.length > 32 || !validCharsRegex.hasMatch(name)) {
-      return "name";
-    }
-    if (password.length < 6 || password.length > 32 || !validCharsRegex.hasMatch(password)) {
-      return "password";
-    }
-    return "valid";
   }
 
   Future<String> checkValidNewUser(String email, String password, String name) async {
@@ -64,21 +41,6 @@ class LogInViewmodel {
     }
     if (name.length < 3 || name.length > 32 || !validCharsRegex.hasMatch(name)) {
       return "name";
-    }
-    if (password.length < 6 || password.length > 32 || !validCharsRegex.hasMatch(password)) {
-      return "password";
-    }
-    return "valid";
-  }
-
-  String checkValidLog(String password, String email) {
-    if (password.isEmpty || email.isEmpty){
-      return "empty";
-    }
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    final validCharsRegex = RegExp(r'^[a-zA-Z0-9._-]+$');
-    if (email.length > 320 || !emailRegex.hasMatch(email)) {
-      return "email";
     }
     if (password.length < 6 || password.length > 32 || !validCharsRegex.hasMatch(password)) {
       return "password";
