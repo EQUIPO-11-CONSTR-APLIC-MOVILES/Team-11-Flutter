@@ -27,7 +27,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => AuthScreen(),
+          builder: (context) => const AuthScreen(),
       ),
     ); 
     

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';  // Add provider package
 import 'package:restau/viewmodels/log_in_viewmodel.dart';
-import 'package:restau/viewmodels/user.dart';
+import 'package:restau/viewmodels/user_viewmodel.dart';
 import '../viewmodels/navigator_viewmodel.dart'; 
 import 'home_screen.dart';
 import 'random_screen.dart';
@@ -18,7 +18,7 @@ class NavigatorScreen extends StatefulWidget {
 
 class NavigatorScreenState extends State<NavigatorScreen> {
   
-  User activeUser = User();
+  UserViewModel activeUser = UserViewModel();
   LogInViewmodel livm = LogInViewmodel();
 
   static final List<Widget> _widgetOptions = <Widget>[
