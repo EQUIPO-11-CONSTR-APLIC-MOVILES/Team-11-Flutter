@@ -1,0 +1,54 @@
+import 'dart:math';
+import 'package:restau/models/auth_repository.dart';
+import 'package:restau/viewmodels/log_in_viewmodel.dart';
+
+class RegisterViewModel {
+  AuthRepository repo = AuthRepository();
+  LogInViewmodel vm = LogInViewmodel();
+
+  final List<String> _profilePics = [
+    "https://firebasestorage.googleapis.com/v0/b/restau-5dba7.appspot.com/o/profilePics%2Falien.png?alt=media&token=741eaac3-c4a5-4753-9293-9f40826dbc0d",
+    "https://firebasestorage.googleapis.com/v0/b/restau-5dba7.appspot.com/o/profilePics%2Fant.png?alt=media&token=183f90eb-5ef3-4206-a863-738c64235cef",
+    "https://firebasestorage.googleapis.com/v0/b/restau-5dba7.appspot.com/o/profilePics%2Fastronaut.png?alt=media&token=d4eb4a0f-0205-4d78-9edb-3fbcab8181de",
+    "https://firebasestorage.googleapis.com/v0/b/restau-5dba7.appspot.com/o/profilePics%2Fbee.png?alt=media&token=7a934c3e-a0bd-4557-b64d-200aec680bf2",
+    "https://firebasestorage.googleapis.com/v0/b/restau-5dba7.appspot.com/o/profilePics%2Fcat.png?alt=media&token=ec0c9822-0446-453d-92de-d67620be6008"
+  ];
+
+  void logIn(String username, String password) {
+    vm.logIn(username, password);
+  }
+
+  void registerUser(String email, String user, String password, List<String> preferences) {
+    String randomProfilePic = _profilePics[Random().nextInt(_profilePics.length)];
+    repo.registerUserInAuth(email, password);
+    logIn(email, password);
+    repo.registerUserInDB(email, password, user, randomProfilePic, preferences);
+  }
+
+  Future<String> checkValidNewUser(String email, String password, String name) async {
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
+    final validCharsRegex = RegExp(r'^[a-zA-Z0-9._-]+$');
+
+    final validMail = await repo.isEmailRegistered(email);
+
+    if (password.isEmpty || name.isEmpty || email.isEmpty){
+      return "empty";
+    }
+
+    if (email.length > 320 || !emailRegex.hasMatch(email) || validMail) {
+      return "email";
+    }
+    if (name.length < 3 || name.length > 32 || !validCharsRegex.hasMatch(name)) {
+      return "name";
+    }
+    if (password.length < 6 || password.length > 32 || !validCharsRegex.hasMatch(password)) {
+      return "password";
+    }
+    return "valid";
+  }
+
+  Future<List<Map<String, dynamic>>> getAllPreferences() async {
+    return repo.getAllPreferences();
+  }
+}

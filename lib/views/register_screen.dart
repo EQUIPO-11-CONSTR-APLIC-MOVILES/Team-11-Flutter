@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:restau/viewmodels/log_in_viewmodel.dart';
+import 'package:restau/viewmodels/register_viewmodel.dart';
 import 'package:restau/views/auth_screen.dart';
 import 'package:restau/views/set_preferences_screen.dart';
 
@@ -15,7 +15,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController mailController = TextEditingController();
-  LogInViewmodel vm = LogInViewmodel();
+  RegisterViewModel vm = RegisterViewModel();
 
   bool obscurePassword = true;
   String? errorMessage; 
