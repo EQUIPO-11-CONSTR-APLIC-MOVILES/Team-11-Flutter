@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:restau/auth/auth_repository.dart';
+import 'package:restau/navigation/user_repository.dart';
 
 class UserViewModel {
-  final AuthRepository repo = AuthRepository();
+  final UserRepository repo = UserRepository();
 
   UserViewModel._privateConstructor();
 
@@ -54,5 +54,41 @@ class UserViewModel {
       print('User info not found for email: $email');
       return null; // Or handle the case appropriately
     }
+  }
+
+  Future<List<String>> getLikedRestaurants() async {
+    String? email = FirebaseAuth.instance.currentUser?.email;
+
+    if (email == null) {
+      print('No user is currently logged in.');
+      return [];
+    }
+
+    List<String>? restaurants = await repo.getLikedRestaurants(email);
+    return restaurants;
+  }
+
+  Future<void> likeRestaurant(String restaurant) async{
+    String? email = FirebaseAuth.instance.currentUser?.email;
+
+    if (email == null) {
+      print('No user is currently logged in.');
+    } else {
+      await repo.likeRestaurant(email, restaurant);
+    }
+  }
+
+  Future<void> unlikeRestaurant(String restaurant) async{
+    String? email = FirebaseAuth.instance.currentUser?.email;
+
+    if (email == null) {
+      print('No user is currently logged in.');
+    } else {
+      await repo.unlikeRestaurant(email, restaurant);
+    }
+  }
+
+  void logOut(){
+    repo.logOut();
   }
 }
