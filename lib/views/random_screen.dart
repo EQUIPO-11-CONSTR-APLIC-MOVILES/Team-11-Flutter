@@ -20,7 +20,8 @@ class _RandomScreenState extends State<RandomScreen> {
 
   // This method is also asynchronous
   void quitar() async {
-    await vm.unlikeRestaurant('ASGwnFThCchDFGncxn84'); // Await the unlike operation
+    await vm
+        .unlikeRestaurant('ASGwnFThCchDFGncxn84'); // Await the unlike operation
     _updateRestaurants(); // Call a separate method to update the state
   }
 
@@ -29,7 +30,8 @@ class _RandomScreenState extends State<RandomScreen> {
     // Await the fetching of liked restaurants
     final likedRestaurants = await vm.getLikedRestaurants();
     setState(() {
-      restaurants = likedRestaurants.toString(); // Update the state with fetched restaurants
+      restaurants = likedRestaurants
+          .toString(); // Update the state with fetched restaurants
     });
   }
 
@@ -38,7 +40,7 @@ class _RandomScreenState extends State<RandomScreen> {
     return Scaffold(
       body: Center(
         child: Column(
-          /** mainAxisAlignment: MainAxisAlignment.center, // Center the column vertically
+            /** mainAxisAlignment: MainAxisAlignment.center, // Center the column vertically
           children: [
             FilledButton(onPressed: ponerRestaurante, child: const Text('Poner Restaurante')),
             FilledButton(onPressed: quitar, child: const Text('Quitar Restaurante')),
@@ -46,7 +48,8 @@ class _RandomScreenState extends State<RandomScreen> {
               Text(restaurants!)
             ]
           ],
-        */),
+        */
+            ),
       ),
     );
   }
