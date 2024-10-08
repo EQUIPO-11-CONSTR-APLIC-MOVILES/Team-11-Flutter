@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as location_pkg;
-import 'package:permission_handler/permission_handler.dart' as permission_handler_pkg;
+import 'package:permission_handler/permission_handler.dart'
+    as permission_handler_pkg;
 import 'package:restau/map/map_state.dart';
-import '../models/firestore_service.dart';
+import 'package:restau/models/firestore_service.dart';
 import 'package:restau/models/restaurant.dart';
 
 class MapViewModel extends ChangeNotifier {
@@ -40,18 +41,22 @@ class MapViewModel extends ChangeNotifier {
       }
     }
 
-    _location.onLocationChanged.listen((location_pkg.LocationData currentLocation) {
+    _location.onLocationChanged
+        .listen((location_pkg.LocationData currentLocation) {
       if (!_initialLocationSet) {
         _state = _state.copyWith(
-          userLocation: LatLng(currentLocation.latitude!, currentLocation.longitude!),
-          circleLocation: LatLng(currentLocation.latitude!, currentLocation.longitude!),
+          userLocation:
+              LatLng(currentLocation.latitude!, currentLocation.longitude!),
+          circleLocation:
+              LatLng(currentLocation.latitude!, currentLocation.longitude!),
           permissionsGranted: true,
           isCheckingPermissions: false,
         );
         _initialLocationSet = true;
       } else {
         _state = _state.copyWith(
-          circleLocation: LatLng(currentLocation.latitude!, currentLocation.longitude!),
+          circleLocation:
+              LatLng(currentLocation.latitude!, currentLocation.longitude!),
           permissionsGranted: true,
           isCheckingPermissions: false,
         );
@@ -66,9 +71,7 @@ class MapViewModel extends ChangeNotifier {
 
   void _updatePermissionStatus(bool permissionsGranted) {
     _state = _state.copyWith(
-      permissionsGranted: permissionsGranted,
-      isCheckingPermissions: false
-    );
+        permissionsGranted: permissionsGranted, isCheckingPermissions: false);
     notifyListeners();
   }
 
@@ -87,14 +90,15 @@ class MapViewModel extends ChangeNotifier {
 
     final restaurants = await _firestoreService.getAllRestaurants();
     _state = _state.copyWith(
-      restaurants: restaurants.map((data) => Restaurant.fromMap(data)).toList()
-    );
+        restaurants:
+            restaurants.map((data) => Restaurant.fromMap(data)).toList());
   }
 
   void updateRestaurantDistances(location_pkg.LocationData currentLocation) {
     List<Restaurant> modifiableList = List.from(_state.restaurants);
     for (final restaurant in modifiableList) {
-      restaurant.calculateDistance(LatLng(currentLocation.latitude!, currentLocation.longitude!));
+      restaurant.calculateDistance(
+          LatLng(currentLocation.latitude!, currentLocation.longitude!));
     }
     modifiableList.sort((a, b) => a.distance.compareTo(b.distance));
     _state = _state.copyWith(restaurants: modifiableList);
@@ -121,6 +125,7 @@ class MapViewModel extends ChangeNotifier {
 
   void updateShownRestaurants() {
     int index = _binarySearch(_state.restaurants);
-  _state = _state.copyWith(nearRestaurants: _state.restaurants.sublist(0, index));
+    _state =
+        _state.copyWith(nearRestaurants: _state.restaurants.sublist(0, index));
   }
 }
