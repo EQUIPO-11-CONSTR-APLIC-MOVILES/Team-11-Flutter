@@ -18,7 +18,6 @@ class NavigatorScreen extends StatefulWidget {
 
 class NavigatorScreenState extends State<NavigatorScreen> {
   UserViewModel activeUser = UserViewModel();
-  LogInViewmodel livm = LogInViewmodel();
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
@@ -134,7 +133,7 @@ class NavigatorScreenState extends State<NavigatorScreen> {
       ],
     ).then((value) {
       if (value == 'logout') {
-        livm.logOut();
+        activeUser.logOut();
         // Optionally, navigate to the login screen or show a snackbar
       }
     });
