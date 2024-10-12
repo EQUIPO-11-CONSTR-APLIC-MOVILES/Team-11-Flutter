@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:restau/auth/register_viewmodel.dart';
 import 'package:restau/auth/auth_screen.dart';
+import 'package:restau/widgets/preference_button.dart';
 
-class SetPreferencesScreen extends StatefulWidget {
+class SetPreferencesScreen extends StatelessWidget {
   const SetPreferencesScreen({super.key, required this.mail, required this.user, required this.password});
 
   final String mail;
@@ -10,31 +11,21 @@ class SetPreferencesScreen extends StatefulWidget {
   final String password;
 
   @override
-  State<SetPreferencesScreen> createState() => _SetPreferencesScreenState();
-}
-
-class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
-  String? _errorMessage;
-  final RegisterViewModel vm = RegisterViewModel();
-  
-  // A set to keep track of selected preferences
-  Set<String> selectedPreferences = {};
-
-  void attemptRegister() async {
-
-    vm.registerUser(widget.mail, widget.user, widget.password, selectedPreferences.toList());
-    
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => const AuthScreen(),
-      ),
-    ); 
-    
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final RegisterViewModel vm = RegisterViewModel();
+    Set<String> selectedPreferences = {};
+
+    void attemptRegister() async {
+      vm.registerUser(mail, user, password, selectedPreferences.toList());
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const AuthScreen(),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
@@ -50,7 +41,6 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            // The FutureBuilder wrapped inside Expanded to take up available space
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>?>(
                 future: vm.getAllPreferences(),
@@ -62,9 +52,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(child: Text('No preferences found'));
                   } else {
-                    // Data is available, we process it
                     var preferences = snapshot.data!;
-                    
                     return ListView(
                       children: preferences.map((preferenceMap) {
                         return Column(
@@ -89,43 +77,14 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                                   ),
                                   const SizedBox(height: 10),
                                   SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal, // Allows horizontal scrolling
+                                    scrollDirection: Axis.horizontal,
                                     child: Row(
                                       children: options.map((option) {
-                                        // Determine the button color based on whether the option is selected
-                                        final bool isSelected = selectedPreferences.contains(option.toString());
-                                        final Color buttonColor = isSelected ? const Color(0xFFFFEEAD) : Colors.white;
-
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                          child: ElevatedButton(
-                                            style: ButtonStyle(
-                                              backgroundColor: WidgetStateProperty.all(buttonColor),
-                                              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                                                ),
-                                              ),
-                                              elevation: WidgetStateProperty.all(5.0), // Shadow elevation
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                                                // Toggle selection: add or remove from the set
-                                                if (isSelected) {
-                                                  selectedPreferences.remove(option.toString());
-                                                } else {
-                                                  selectedPreferences.add(option.toString());
-                                                }
-                                              });
-                                            },
-                                            child: Text(
-                                              option.toString(),
-                                              style: const TextStyle(
-                                                color: Colors.black, // Text color
-                                                fontFamily: 'Poppins', // Font family
-                                                fontSize: 16.0, // Optional: You can adjust the font size
-                                              ),
-                                            ),
+                                          child: PreferenceButton(
+                                            option: option.toString(),
+                                            selectedPreferences: selectedPreferences,
                                           ),
                                         );
                                       }).toList(),
@@ -139,20 +98,9 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                       }).toList(),
                     );
                   }
-                }
+                },
               ),
             ),
-            if (_errorMessage != null) ...[
-              Text(
-                _errorMessage!,
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                ),
-              ),
-            ],
-           
             SizedBox(
               width: double.infinity,
               child: FilledButton(
