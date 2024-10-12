@@ -13,7 +13,13 @@ class AuthScreen extends StatelessWidget {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot){
             if (snapshot.hasData){
-              return const NavigatorScreen();
+              return WillPopScope(
+              onWillPop: () async {
+                // Returning false prevents the back action
+                return false;
+              },
+              child: const NavigatorScreen(),
+            );
             } else {
               return const LogInScreen();
             }

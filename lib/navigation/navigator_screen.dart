@@ -34,6 +34,7 @@ class NavigatorScreenState extends State<NavigatorScreen> {
       create: (context) => NavigatorViewModel(),
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
