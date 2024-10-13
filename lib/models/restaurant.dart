@@ -64,6 +64,9 @@ class Restaurant {
     return id;
   }
 
+  List<String> getTypes(){
+    return categories;
+  }
 
   double _degToRad(double deg) {
     return deg * (pi / 180);
