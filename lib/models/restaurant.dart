@@ -13,6 +13,7 @@ class Restaurant {
   final Timestamp openingDate;
   final String placeName;
   final Map<String, Map<String, dynamic>> schedule;
+  final String id;
 
   double distance;
 
@@ -26,6 +27,7 @@ class Restaurant {
     required this.openingDate,
     required this.placeName,
     required this.schedule,
+    required this.id,
 
     this.distance = 0.0,
   });
@@ -42,6 +44,7 @@ class Restaurant {
       openingDate: data['openingDate'],
       placeName: data['placeName'],
       schedule: Map<String, Map<String, dynamic>>.from(data['schedule']),
+      id: data['id']
     );
   }
 
@@ -56,6 +59,11 @@ class Restaurant {
     final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     distance = earthRadius * c;
   }
+
+  String getId(){
+    return id;
+  }
+
 
   double _degToRad(double deg) {
     return deg * (pi / 180);

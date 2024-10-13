@@ -1,15 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:restau/models/restaurant.dart';
+import 'package:restau/navigation/user_viewmodel.dart';
 
-class RestaurantItem extends StatelessWidget {
+class RestaurantItem extends StatefulWidget {
   final Restaurant restaurant;
 
   const RestaurantItem({super.key, required this.restaurant});
 
   @override
+  State<RestaurantItem> createState() => _RestaurantItemState();
+}
+
+class _RestaurantItemState extends State<RestaurantItem> {
+  bool isLiked = false; // Track whether the restaurant is liked
+  late UserViewModel vm; // ViewModel instance
+  List<String> likedRestaurantIds = []; // Store liked restaurant IDs
+
+  @override
+  void initState() {
+    super.initState();
+    vm = UserViewModel();
+    fetchLikedRestaurants();
+  }
+
+  Future<void> fetchLikedRestaurants() async {
+    // Fetch liked restaurant IDs and check if this restaurant is in the liked list
+    likedRestaurantIds = await vm.getLikedRestaurants();
+    setState(() {
+      isLiked = likedRestaurantIds.contains(widget.restaurant.id);
+    });
+  }
+
+  void toggleLike() {
+    setState(() {
+      isLiked = !isLiked; 
+      if (isLiked) {
+        vm.likeRestaurant(widget.restaurant.id); 
+      } else {
+        vm.unlikeRestaurant(widget.restaurant.id); 
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final DateTime now = DateTime.now();
-    final DateTime openingDate = restaurant.openingDate.toDate();
+    final DateTime openingDate = widget.restaurant.openingDate.toDate();
     final bool isNew = now.difference(openingDate).inDays <= 30;
 
     return Center(
@@ -23,21 +59,24 @@ class RestaurantItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
               image: DecorationImage(
                 image: NetworkImage(
-                    restaurant.imageUrl), // Use NetworkImage for Firebase URL
+                    widget.restaurant.imageUrl), // Use NetworkImage for Firebase URL
                 fit: BoxFit.cover,
               ),
             ),
           ),
           // Favorite icon in top-left corner
-          const Positioned(
+          Positioned(
             top: 10,
             left: 10,
-            child: CircleAvatar(
-              backgroundColor: Color(0xFFD9534F),
-              radius: 18,
-              child: Icon(
-                Icons.favorite_border,
-                color: Colors.white,
+            child: GestureDetector(
+              onTap: toggleLike, // Call toggleLike on tap
+              child: CircleAvatar(
+                backgroundColor: const Color(0xFFD9534F),
+                radius: 18,
+                child: Icon(
+                  isLiked ? Icons.favorite : Icons.favorite_border, // Toggle icon
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
@@ -93,18 +132,17 @@ class RestaurantItem extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        restaurant.name,
+                        widget.restaurant.name,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
-                              fontSize:
-                                  18, // Set your desired font size heregit
+                              fontSize: 18, // Set your desired font size here
                             ),
                       ),
                       const Spacer(),
                       const Icon(Icons.star, color: Colors.black, size: 16),
                       const SizedBox(width: 4),
                       Text(
-                        restaurant.averageRating.toString(),
+                        widget.restaurant.averageRating.toString(),
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                               fontSize: 16, // Set your desired font size here
@@ -121,15 +159,14 @@ class RestaurantItem extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          restaurant.placeName,
+                          widget.restaurant.placeName,
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium
                               ?.copyWith(
                                 fontSize: 16, // Set your desired font size here
                               ),
-                          overflow: TextOverflow
-                              .ellipsis, // To handle overflow gracefully
+                          overflow: TextOverflow.ellipsis, // To handle overflow gracefully
                         ),
                       ),
                     ],

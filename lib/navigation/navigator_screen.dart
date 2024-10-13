@@ -6,7 +6,7 @@ import 'package:restau/search/search_view.dart';
 import 'navigator_viewmodel.dart';
 import '../home/home_screen.dart';
 import '../views/random_screen.dart';
-import '../views/liked_screen.dart';
+import '../liked/liked_screen.dart';
 import '../map/map_screen.dart';
 
 class NavigatorScreen extends StatefulWidget {
