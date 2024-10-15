@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restau/models/restaurant.dart';
+import 'package:restau/models/restaurant_viewmodel.dart';
 import 'package:restau/navigation/user_viewmodel.dart';
 
 class RestaurantItem extends StatefulWidget {
@@ -12,14 +13,16 @@ class RestaurantItem extends StatefulWidget {
 }
 
 class _RestaurantItemState extends State<RestaurantItem> {
-  bool isLiked = false; // Track whether the restaurant is liked
-  late UserViewModel vm; // ViewModel instance
-  List<String> likedRestaurantIds = []; // Store liked restaurant IDs
+  bool isLiked = false; 
+  late UserViewModel vm; 
+  late RestaurantViewmodel rvm;
+  List<String> likedRestaurantIds = []; 
 
   @override
   void initState() {
     super.initState();
     vm = UserViewModel();
+    rvm = RestaurantViewmodel();
     fetchLikedRestaurants();
   }
 
@@ -27,7 +30,7 @@ class _RestaurantItemState extends State<RestaurantItem> {
     // Fetch liked restaurant IDs and check if this restaurant is in the liked list
     likedRestaurantIds = await vm.getLikedRestaurants();
     setState(() {
-      isLiked = likedRestaurantIds.contains(widget.restaurant.id);
+      isLiked = likedRestaurantIds.contains(widget.restaurant.getId());
     });
   }
 
@@ -35,9 +38,9 @@ class _RestaurantItemState extends State<RestaurantItem> {
     setState(() {
       isLiked = !isLiked; 
       if (isLiked) {
-        vm.likeRestaurant(widget.restaurant.id); 
+        vm.likeRestaurant(widget.restaurant.getId()); 
       } else {
-        vm.unlikeRestaurant(widget.restaurant.id); 
+        vm.unlikeRestaurant(widget.restaurant.getId()); 
       }
     });
   }
@@ -51,16 +54,20 @@ class _RestaurantItemState extends State<RestaurantItem> {
     return Center(
       child: Stack(
         children: [
-          // Image container
-          Container(
-            width: 350,
-            height: 350,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              image: DecorationImage(
-                image: NetworkImage(
-                    widget.restaurant.imageUrl), // Use NetworkImage for Firebase URL
-                fit: BoxFit.cover,
+          // Wrap the image container with GestureDetector to detect taps
+          GestureDetector(
+            onTap: () {
+              rvm.sendPreferences(widget.restaurant.getTypes()); // Call sendPreferences when the image is tapped
+            },
+            child: Container(
+              width: 350,
+              height: 350,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                image: DecorationImage(
+                  image: NetworkImage(widget.restaurant.imageUrl),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
@@ -178,5 +185,6 @@ class _RestaurantItemState extends State<RestaurantItem> {
         ],
       ),
     );
+
   }
 }

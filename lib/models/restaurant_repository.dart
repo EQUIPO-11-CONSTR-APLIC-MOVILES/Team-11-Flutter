@@ -47,4 +47,15 @@ class RestaurantRepository {
       return [];
     }
   }
+
+  Future<void> registerSearchType(Map<String, dynamic> types) async {
+    try {
+      await _db.collection('restaurant_search_types').add(types);
+    } catch (e) {
+      print("Error registering user: $e");
+      if (e is FirebaseException) {
+        print("FirebaseException: ${e.message}");
+      }
+    }
+  }
 }
