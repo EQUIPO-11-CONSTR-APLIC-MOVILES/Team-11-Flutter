@@ -3,6 +3,8 @@ import 'package:restau/models/restaurant.dart';
 import 'package:restau/models/restaurant_repository.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class SearchViewModel extends ChangeNotifier {
   final TextEditingController searchController = TextEditingController();
@@ -17,14 +19,14 @@ class SearchViewModel extends ChangeNotifier {
   bool get isListening => _isListening;
   List<Restaurant> _lastSearchResults = [];
   String get lastSearchQuery => searchQuery;
-
   bool _showRecentSearches = false;
-
   bool get showRecentSearches => _showRecentSearches;
 
   SearchViewModel() {
     _speech = stt.SpeechToText();
     _fetchRestaurants();
+    _loadLastSearchResults();
+    _filteredRestaurants = _lastSearchResults;
   }
 
   Future<void> _fetchRestaurants() async {
@@ -50,21 +52,47 @@ class SearchViewModel extends ChangeNotifier {
   }
 
   void _filterRestaurants() {
+    searchQuery = searchQuery.trim();
+
     if (searchQuery.isEmpty) {
       _filteredRestaurants = _lastSearchResults;
       _showRecentSearches = true;
     } else {
       _filteredRestaurants = _allRestaurants.where((restaurant) {
-        final nameMatches = restaurant.name
-            .toLowerCase()
-            .contains(searchQuery.toLowerCase().trim());
+        final nameMatches =
+            restaurant.name.toLowerCase().contains(searchQuery.toLowerCase());
         final categoryMatches = restaurant.categories.any((category) =>
-            category.toLowerCase().contains(searchQuery.toLowerCase().trim()));
+            category.toLowerCase().contains(searchQuery.toLowerCase()));
         return nameMatches || categoryMatches;
       }).toList();
       _lastSearchResults = _filteredRestaurants;
+      _showRecentSearches = false;
+
+      // Guardar resultados recientes
+      _saveLastSearchResults();
     }
 
+    notifyListeners();
+  }
+
+// Guardar resultados recientes en SharedPreferences
+  Future<void> _saveLastSearchResults() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> jsonList = _lastSearchResults.map((restaurant) {
+      return jsonEncode(restaurant.toMap());
+    }).toList();
+    await prefs.setStringList('lastSearchResults', jsonList);
+  }
+
+// Cargar resultados recientes de SharedPreferences
+  Future<void> _loadLastSearchResults() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? jsonList = prefs.getStringList('lastSearchResults');
+    if (jsonList != null) {
+      _lastSearchResults = jsonList.map((jsonString) {
+        return Restaurant.fromMap(jsonDecode(jsonString));
+      }).toList();
+    }
     notifyListeners();
   }
 
@@ -72,9 +100,11 @@ class SearchViewModel extends ChangeNotifier {
     return _lastSearchResults;
   }
 
-  void clearLastSearchResults() {
+  void clearLastSearchResults() async {
     _lastSearchResults = [];
     _showRecentSearches = false;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('lastSearchResults');
     notifyListeners();
   }
 

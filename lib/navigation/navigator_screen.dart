@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Add provider package
-import 'package:restau/auth/log_in_viewmodel.dart';
 import 'package:restau/navigation/user_viewmodel.dart';
 import 'package:restau/search/search_view.dart';
 import 'navigator_viewmodel.dart';
@@ -151,9 +150,11 @@ class NavigatorScreenState extends State<NavigatorScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          contentPadding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0), // Adjusts the padding
+          contentPadding: const EdgeInsets.fromLTRB(
+              24.0, 24.0, 24.0, 24.0), // Adjusts the padding
           content: Padding(
-            padding: const EdgeInsets.only(top: 20.0), // Custom top padding for the message
+            padding: const EdgeInsets.only(
+                top: 20.0), // Custom top padding for the message
             child: Text(
               message,
               style: const TextStyle(
@@ -167,13 +168,12 @@ class NavigatorScreenState extends State<NavigatorScreen> {
           actions: <Widget>[
             TextButton(
               child: const Text('Dismiss',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                  fontFamily: "Poppins",
-                  fontWeight: FontWeight.bold,
-                )
-              ),
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                  )),
               onPressed: () {
                 vm.apiMessage = '';
                 Navigator.of(context).pop();
@@ -181,13 +181,12 @@ class NavigatorScreenState extends State<NavigatorScreen> {
             ),
             TextButton(
               child: const Text("Let's go!",
-                style: TextStyle(
-                  color: Color(0xFFD9534F),
-                  fontSize: 16,
-                  fontFamily: "Poppins",
-                  fontWeight: FontWeight.bold,
-                )
-              ),
+                  style: TextStyle(
+                    color: Color(0xFFD9534F),
+                    fontSize: 16,
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                  )),
               onPressed: () {
                 vm.apiMessage = '';
                 Navigator.of(context).pop();
