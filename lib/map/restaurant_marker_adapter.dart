@@ -32,8 +32,17 @@ class RestaurantMarkerAdapter {
 
   BitmapDescriptor _selectIcon(Restaurant restaurant) {
     bool isNew = DateTime.now().difference(restaurant.openingDate.toDate()).inDays < 30;
+    
     bool isLiked = userViewModel.likedRestaurants.contains(restaurant.id);
-    if (isNew && !isLiked) {
+    
+    List<dynamic> preferences = [];
+    if (userViewModel.userInfo != null && userViewModel.userInfo!.containsKey("preferences")) {
+      preferences = userViewModel.userInfo!["preferences"];
+    }
+    List<String> categories = restaurant.categories;
+    bool categoryMatch = preferences.any((element) => categories.contains(element));
+    
+    if (isNew && !isLiked && categoryMatch) {
       print('New restaurant: ${restaurant.name}');
       return newRestaurantIcon ?? BitmapDescriptor.defaultMarker;
     }
