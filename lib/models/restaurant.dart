@@ -32,22 +32,19 @@ class Restaurant {
 
   factory Restaurant.fromMap(Map<String, dynamic> data) {
     return Restaurant(
-      name: data['name'] as String,
-      latitude: data['latitude'] as double,
-      longitude: data['longitude'] as double,
-      averageRating: data['averageRating'] as num,
-      imageUrl: data['imageUrl'] as String,
-      categories: List<String>.from(data['categories'] as List<dynamic>),
-      openingDate: data['openingDate'] is Timestamp
-          ? data['openingDate'] as Timestamp
-          : Timestamp.fromMillisecondsSinceEpoch(data['openingDate'] as int),
-      placeName: data['placeName'] as String,
-      schedule: Map<String, Map<String, dynamic>>.from(
-        (data['schedule'] as Map<String, dynamic>).map((key, value) =>
-            MapEntry(key, Map<String, dynamic>.from(value as Map))),
-      ),
-      id: data['id'] as String,
-    );
+        name: data['name'] as String,
+        latitude: data['latitude'] as double,
+        longitude: data['longitude'] as double,
+        averageRating: data['averageRating'] as num,
+        imageUrl: data['imageUrl'] as String,
+        categories: List<String>.from(data['categories'] as List<dynamic>),
+        openingDate: data['openingDate'] as Timestamp,
+        placeName: data['placeName'] as String,
+        schedule: Map<String, Map<String, dynamic>>.from(
+          (data['schedule'] as Map<String, dynamic>).map((key, value) =>
+              MapEntry(key, Map<String, dynamic>.from(value as Map))),
+        ),
+        id: data['id'] as String);
   }
 
   Map<String, dynamic> toMap() {
