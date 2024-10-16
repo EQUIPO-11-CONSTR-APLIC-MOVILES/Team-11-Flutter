@@ -4,11 +4,11 @@ import 'package:location/location.dart' as location_pkg;
 import 'package:permission_handler/permission_handler.dart'
     as permission_handler_pkg;
 import 'package:restau/map/map_state.dart';
-import 'package:restau/models/firestore_service.dart';
 import 'package:restau/models/restaurant.dart';
+import 'package:restau/models/restaurant_repository.dart';
 
 class MapViewModel extends ChangeNotifier {
-  final FirestoreService _firestoreService = FirestoreService();
+  final RestaurantRepository repo = RestaurantRepository();
   MapState _state = MapState();
   MapState get state => _state;
   final location_pkg.Location _location = location_pkg.Location();
@@ -88,7 +88,7 @@ class MapViewModel extends ChangeNotifier {
   Future<void> fetchRestaurants() async {
     _state = _state.copyWith(isCheckingPermissions: true);
 
-    final restaurants = await _firestoreService.getAllRestaurants();
+    final restaurants = await repo.getAllRestaurantsMap();
     _state = _state.copyWith(
         restaurants:
             restaurants.map((data) => Restaurant.fromMap(data)).toList());
