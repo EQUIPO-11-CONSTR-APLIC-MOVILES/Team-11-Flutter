@@ -3,6 +3,7 @@ import 'package:restau/navigation/user_repository.dart';
 
 class UserViewModel {
   final UserRepository repo = UserRepository();
+  final List<String> likedRestaurants = [];
 
   UserViewModel._privateConstructor();
 
@@ -65,6 +66,9 @@ class UserViewModel {
     }
 
     List<String>? restaurants = await repo.getLikedRestaurants(email);
+    likedRestaurants.clear();
+    likedRestaurants.addAll(restaurants);
+    print('Liked restaurants: $likedRestaurants');
     return restaurants;
   }
 
@@ -74,6 +78,7 @@ class UserViewModel {
     if (email == null) {
       print('No user is currently logged in.');
     } else {
+      likedRestaurants.add(restaurant);
       await repo.likeRestaurant(email, restaurant);
     }
   }
@@ -84,6 +89,7 @@ class UserViewModel {
     if (email == null) {
       print('No user is currently logged in.');
     } else {
+      likedRestaurants.remove(restaurant);
       await repo.unlikeRestaurant(email, restaurant);
     }
   }

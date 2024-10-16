@@ -2,12 +2,15 @@ import 'package:restau/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:restau/widgets/info_window.dart';
+import 'package:restau/navigation/user_viewmodel.dart';
 
 class RestaurantMarkerAdapter {
   final Restaurant restaurant;
   final BuildContext context;
+  final UserViewModel userViewModel = UserViewModel();
+  final BitmapDescriptor? newRestaurantIcon;
 
-  RestaurantMarkerAdapter({required this.restaurant, required this.context});
+  RestaurantMarkerAdapter({required this.restaurant, required this.context, this.newRestaurantIcon});
 
   Marker toMarker() {
     return Marker(
@@ -28,8 +31,13 @@ class RestaurantMarkerAdapter {
   }
 
   BitmapDescriptor _selectIcon(Restaurant restaurant) {
-    // Implement your logic to select the icon based on the restaurant
-    // For example:
+    bool isNew = DateTime.now().difference(restaurant.openingDate.toDate()).inDays < 30;
+    bool isLiked = userViewModel.likedRestaurants.contains(restaurant.id);
+    if (isNew && !isLiked) {
+      print('New restaurant: ${restaurant.name}');
+      return newRestaurantIcon ?? BitmapDescriptor.defaultMarker;
+    }
+
     return BitmapDescriptor.defaultMarker;
   }
 }
