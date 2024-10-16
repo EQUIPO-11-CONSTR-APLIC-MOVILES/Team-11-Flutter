@@ -119,8 +119,8 @@ class NavigatorViewModel extends ChangeNotifier {
       final response = await http
         .get(
           Uri.parse(
-            '$apiURL/nearbyxcuisine?userID=lPS20gyuL2SeBaf5tmiy4pVlnLK2&lat=4.6733676&lon=-74.1012443'),
-            //'$apiURL/nearbyxcuisine?userID=$userID&lat=$lat&lon=$lon'),
+            //'$apiURL/nearbyxcuisine?userID=lPS20gyuL2SeBaf5tmiy4pVlnLK2&lat=4.6733676&lon=-74.1012443'),
+            '$apiURL/nearbyxcuisine?userID=$userID&lat=$lat&lon=$lon'),
         )
         .timeout(const Duration(seconds: 5)); // 10-second timeout
 

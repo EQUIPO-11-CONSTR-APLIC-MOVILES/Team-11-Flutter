@@ -15,11 +15,23 @@ class MapScreen extends StatefulWidget {
 
 class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
   late MapViewModel viewModel;
+  BitmapDescriptor? newRestaurantIcon;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this); // Add observer to listen for app state changes
+    _loadMarkerIcons();
+  }
+
+  Future<void> _loadMarkerIcons() async {
+    final icon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(48, 48)),
+      'lib/assets/drawable/marker_new.png',
+    );
+    setState(() {
+      newRestaurantIcon = icon;  // Store the preloaded icon
+    });
   }
 
   @override
@@ -135,7 +147,7 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
         ),
       },
       markers: viewModel.state.nearRestaurants.map((restaurant) {
-        RestaurantMarkerAdapter adapter = RestaurantMarkerAdapter(restaurant: restaurant, context: context);
+        RestaurantMarkerAdapter adapter = RestaurantMarkerAdapter(restaurant: restaurant, context: context, newRestaurantIcon: newRestaurantIcon);
         return adapter.toMarker();
       }).toSet(),
     );

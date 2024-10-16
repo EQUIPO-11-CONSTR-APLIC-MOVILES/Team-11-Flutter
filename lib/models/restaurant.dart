@@ -38,8 +38,7 @@ class Restaurant {
         averageRating: data['averageRating'] as num,
         imageUrl: data['imageUrl'] as String,
         categories: List<String>.from(data['categories'] as List<dynamic>),
-        openingDate:
-            Timestamp.fromMillisecondsSinceEpoch(data['openingDate'] as int),
+        openingDate: data['openingDate'] as Timestamp,
         placeName: data['placeName'] as String,
         schedule: Map<String, Map<String, dynamic>>.from(
           (data['schedule'] as Map<String, dynamic>).map((key, value) =>
