@@ -37,7 +37,7 @@ class _RandomScreenState extends State<RandomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: Column(
             /** mainAxisAlignment: MainAxisAlignment.center, // Center the column vertically
