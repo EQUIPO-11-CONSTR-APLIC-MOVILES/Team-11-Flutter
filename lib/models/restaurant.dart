@@ -45,7 +45,7 @@ class Restaurant {
           (data['schedule'] as Map<String, dynamic>).map((key, value) =>
               MapEntry(key, Map<String, dynamic>.from(value as Map))),
         ),
-        id: data['id']);
+        id: data['id'] as String);
   }
 
   Map<String, dynamic> toMap() {
@@ -59,6 +59,7 @@ class Restaurant {
       'openingDate': openingDate.millisecondsSinceEpoch,
       'placeName': placeName,
       'schedule': schedule,
+      'id': id,
     };
   }
 

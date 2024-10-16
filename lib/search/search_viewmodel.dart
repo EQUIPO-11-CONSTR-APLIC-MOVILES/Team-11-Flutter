@@ -26,7 +26,6 @@ class SearchViewModel extends ChangeNotifier {
     _speech = stt.SpeechToText();
     _fetchRestaurants();
     _loadLastSearchResults();
-    _filteredRestaurants = _lastSearchResults;
   }
 
   Future<void> _fetchRestaurants() async {
@@ -82,6 +81,7 @@ class SearchViewModel extends ChangeNotifier {
       return jsonEncode(restaurant.toMap());
     }).toList();
     await prefs.setStringList('lastSearchResults', jsonList);
+    print('Save: ${jsonList}');
   }
 
 // Cargar resultados recientes de SharedPreferences
@@ -92,8 +92,12 @@ class SearchViewModel extends ChangeNotifier {
       _lastSearchResults = jsonList.map((jsonString) {
         return Restaurant.fromMap(jsonDecode(jsonString));
       }).toList();
+      _filteredRestaurants =
+          _lastSearchResults; // Assign to filteredRestaurants
+      _showRecentSearches = true;
     }
     notifyListeners();
+    print('Load: ${_filteredRestaurants}');
   }
 
   List<Restaurant> getLastSearchResults() {
@@ -101,7 +105,7 @@ class SearchViewModel extends ChangeNotifier {
   }
 
   void clearLastSearchResults() async {
-    _lastSearchResults = [];
+    _filteredRestaurants = [];
     _showRecentSearches = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('lastSearchResults');
