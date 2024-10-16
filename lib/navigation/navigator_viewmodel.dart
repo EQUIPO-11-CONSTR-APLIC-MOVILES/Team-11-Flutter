@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:restau/models/firestore_service.dart';
+import 'package:restau/navigation/navigation_repository.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 import 'package:restau/navigation/user_viewmodel.dart';
@@ -9,7 +9,7 @@ bool _locationSent = false;
 
 class NavigatorViewModel extends ChangeNotifier {
   int _selectedIndex = 0;
-  final FirestoreService _firestoreService = FirestoreService();
+  final NavigationRepository _navigationRepository = NavigationRepository();
   String navigationPath = 'Home'; // Initial path is Home
   late String sessionId;
   String apiMessage = '';
@@ -50,11 +50,11 @@ class NavigatorViewModel extends ChangeNotifier {
   }
 
   Future<String> addNavigationPathToFirestore() async {
-    return await _firestoreService.addNavigationPath(navigationPath);
+    return await _navigationRepository.addNavigationPath(navigationPath);
   }
 
   void updateNavigationPathInFirestore() {
-    _firestoreService.updateNavigationPath(sessionId, navigationPath);
+    _navigationRepository.updateNavigationPath(sessionId, navigationPath);
   }
 
   IconData getIconForIndex(int index) {
@@ -106,7 +106,7 @@ class NavigatorViewModel extends ChangeNotifier {
   }
 
   Future<void> _sendLocationToApi() async {
-    print('Sending location to API');
+    //print('Sending location to API');
     try {
       final userInfo = await activeUser.getUserInfo();
       final userID = userInfo?['uid'];
@@ -115,7 +115,7 @@ class NavigatorViewModel extends ChangeNotifier {
 
       String apiURL = "http://34.134.5.98:8000";
 
-      print("fetching");
+      //print("fetching");
       final response = await http
         .get(
           Uri.parse(
@@ -124,12 +124,12 @@ class NavigatorViewModel extends ChangeNotifier {
         )
         .timeout(const Duration(seconds: 5)); // 10-second timeout
 
-      print("Fetched");
+      //print("Fetched");
 
       if (response.statusCode == 200) {
         final responseBody = response.body.replaceAll('"', "");
 
-        print(responseBody);
+        //print(responseBody);
         if (responseBody != 'null') {
           // Convert string
           final firstChar = responseBody.isNotEmpty ? responseBody[0].toLowerCase() : '';
@@ -142,13 +142,13 @@ class NavigatorViewModel extends ChangeNotifier {
         }
         
       } else {
-        print('Failed to send location to API');
-        print("Response status: ${response.statusCode}");
+        //print('Failed to send location to API');
+        //print("Response status: ${response.statusCode}");
         //apiMessage = 'Failed to get restaurant';
       }
     } catch (e) {
-      print('Failed to send location to API');
-      print(e);
+      //print('Failed to send location to API');
+      //print(e);
       //apiMessage = 'Failed to fetch';
     }
     notifyListeners();

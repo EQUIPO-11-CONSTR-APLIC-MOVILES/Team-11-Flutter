@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FirestoreService {
+class NavigationRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   Future<String> addNavigationPath(String path) async {
@@ -10,8 +10,6 @@ class FirestoreService {
       });
       return docRef.id;
     } catch (e) {
-      // TODO: No imprimir
-      print(e.toString());
       return "";
     }
   }
@@ -22,7 +20,7 @@ class FirestoreService {
         'path': newPath,
       });
     } catch (e) {
-      print(e.toString());
+      return;
     }
   }
 }

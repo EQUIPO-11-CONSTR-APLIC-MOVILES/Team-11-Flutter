@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:restau/liked/liked_viewmodel.dart';
-import 'package:restau/models/firestore_service.dart';
 import 'package:restau/navigation/user_viewmodel.dart';
 import 'package:restau/widgets/restaurant_card/restaurant_list.dart';
 
@@ -13,7 +12,6 @@ class LikedScreen extends StatefulWidget {
 }
 
 class _LikedScreenState extends State<LikedScreen> {
-  final FirestoreService firestoreService = FirestoreService();
   final UserViewModel vm = UserViewModel();
   final LikedViewModel lvm = LikedViewModel();
 
