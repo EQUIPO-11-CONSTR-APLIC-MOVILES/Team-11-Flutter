@@ -4,6 +4,7 @@ import 'package:restau/navigation/user_repository.dart';
 class UserViewModel {
   final UserRepository repo = UserRepository();
   final List<String> likedRestaurants = [];
+  Map<String, dynamic>? userInfo = {};
 
   UserViewModel._privateConstructor();
 
@@ -45,7 +46,7 @@ class UserViewModel {
     }
 
     // Fetch user information using the email
-    Map<String, dynamic>? userInfo = await repo.getUserInfoByEmail(email);
+    userInfo = await repo.getUserInfoByEmail(email);
 
     // Check if userInfo is null
     if (userInfo != null) {

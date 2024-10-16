@@ -186,7 +186,7 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
             Slider(
               value: viewModel.state.circleRadius,
               min: 0,
-              max: 1.5,
+              max: 0.6,
               divisions: 99,
               label: viewModel.state.circleRadius.toStringAsFixed(1),
               onChanged: (value) {
