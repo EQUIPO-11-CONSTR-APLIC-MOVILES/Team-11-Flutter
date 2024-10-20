@@ -58,6 +58,28 @@ class UserViewModel {
     }
   }
 
+  Future<String?> getUserName() async {
+    String? email = FirebaseAuth.instance.currentUser?.email;
+
+    // Check if the email is null
+    if (email == null) {
+      print('No user is currently logged in.');
+      return null; // Or handle the case appropriately
+    }
+
+    // Fetch user information using the email
+    Map<String, dynamic>? userInfo = await repo.getUserInfoByEmail(email);
+
+    // Check if userInfo is null
+    if (userInfo != null) {
+      // Return the profile picture URL
+      return userInfo['name'] as String?;
+    } else {
+      print('User info not found for email: $email');
+      return null; // Or handle the case appropriately
+    }
+  }
+
   Future<List<String>> getLikedRestaurants() async {
     String? email = FirebaseAuth.instance.currentUser?.email;
 
