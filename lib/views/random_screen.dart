@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:restau/navigation/user_viewmodel.dart';
-import 'package:restau/review/write_review_screen.dart';
 
 class RandomScreen extends StatefulWidget {
   const RandomScreen({super.key});
