@@ -15,6 +15,6 @@ class _RandomScreenState extends State<RandomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const WriteReviewScreen(restaurant: 'ASGwnFThCchDFGncxn84');
+    return const Placeholder();
   }
 }

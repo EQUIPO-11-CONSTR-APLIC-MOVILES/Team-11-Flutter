@@ -23,8 +23,23 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
 
   TextEditingController reviewController = TextEditingController();
 
-  void sendReview(){
-    
+  void sendReview() async {
+    if (vm.checkValidReview(reviewController.text, starController.rating) == 'valid'){
+      vm.registerReview(
+        await user.getUserName(), 
+        await user.getUserPic(), 
+        reviewController.text, 
+        starController.rating, 
+        widget.restaurant
+      );
+    }
+    navigateBack();
+  }
+
+  void navigateBack(){
+    //TODO: volver al detalle cuando se haya escrito el review
+    starController.rating = 0;
+    reviewController.text = "";
   }
 
   @override
