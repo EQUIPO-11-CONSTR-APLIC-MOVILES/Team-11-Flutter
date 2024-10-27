@@ -11,12 +11,17 @@ class LogInViewmodel {
     return _instance;
   }
 
-  void logIn(String username, String password) {
+  Future<void> logIn(String username, String password) async {
     repo.logIn(username, password);
   }
 
   void logOut() {
     repo.logOut();
+  }
+
+  bool loggedIn(){
+    String? x = repo.getUserEmail();
+    return x==null ? false : true;
   }
 
   String checkValidUser(String email, String password, String name) {
@@ -52,6 +57,7 @@ class LogInViewmodel {
     if (password.length < 6 || password.length > 32 || !validCharsRegex.hasMatch(password)) {
       return "password";
     }
+    
     return "valid";
   }
 
