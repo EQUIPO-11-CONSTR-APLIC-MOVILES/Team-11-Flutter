@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:restau/auth/register_viewmodel.dart';
@@ -45,6 +46,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() {
       errorMessage = null; 
     });
+
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        errorMessage = "Connect to internet and try again.";
+      });
+      return;
+    }
 
     final ans = await vm.checkValidNewUser(mailController.text,passwordController.text, userController.text);
     if (ans == "email"){

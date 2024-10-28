@@ -8,6 +8,23 @@ class UserRepository {
     FirebaseAuth.instance.signOut();
   }
 
+  Future<String> getUserId(String email) async{
+    try {
+      QuerySnapshot querySnapshot =
+          await _db.collection('users').where('email', isEqualTo: email).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first.id;
+      } else {
+        print('No user found with email: $email');
+        return "null";
+      }
+    } catch (e) {
+      print("Error fetching user info: $e");
+      return "null";
+    }
+  }
+
   Future<Map<String, dynamic>?> getUserInfoByEmail(String email) async {
     try {
       QuerySnapshot querySnapshot =
@@ -59,10 +76,7 @@ class UserRepository {
           likedRestaurants.add(restaurantId);
 
           await _db.collection('users').doc(userDoc.id).update({'likes': likedRestaurants});
-          print("Restaurant $restaurantId liked successfully.");
-        } else {
-          print("Restaurant $restaurantId is already liked.");
-        }
+        } 
       } else {
         print('No user found with email: $email');
       }
@@ -86,10 +100,7 @@ class UserRepository {
           likedRestaurants.remove(restaurantId);
 
           await _db.collection('users').doc(userDoc.id).update({'likes': likedRestaurants});
-          print("Restaurant $restaurantId unliked successfully.");
-        } else {
-          print("Restaurant $restaurantId is not in the liked list.");
-        }
+        } 
       } else {
         print('No user found with email: $email');
       }

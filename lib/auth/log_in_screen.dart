@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:restau/auth/log_in_viewmodel.dart';
 import 'package:restau/auth/register_screen.dart';
 import 'package:sign_in_button/sign_in_button.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -25,32 +26,42 @@ class _LogInScreenState extends State<LogInScreen> {
       _errorMessage = null;
     });
 
-    final ans = vm.checkValidLog(passwordController.text, userController.text);
-    if (ans == "name") {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
       setState(() {
-        _errorMessage = "Invalid user.";
+        _errorMessage = "Connect to internet and try again.";
+      });
+      return;
+    }
+
+    final ans = vm.checkValidLog(passwordController.text, userController.text);
+    if (ans == "email") {
+      setState(() {
+        _errorMessage = "Invalid email";
       });
     } else if (ans == "password") {
       setState(() {
-        _errorMessage = "Invalid user.";
+        _errorMessage = "Invalid password";
       });
     } else if (ans == "empty") {
       setState(() {
-        _errorMessage = "Empty fields detected.";
+        _errorMessage = "Invalid empty fields detected";
       });
     } else {
-      vm.logIn(userController.text, passwordController.text);
+      await vm.logIn(userController.text, passwordController.text);
+      await Future.delayed(const Duration(seconds: 2));
+      setState(() {
+        _errorMessage = "Invalid email or password";
+      });
     }
   }
 
   void signInGoogle() async {
-    /** 
     await FirebaseAuth.instance.signInWithEmailAndPassword(
       // TODO: remove
       email: 's.chamie@uniandes.edu.co',
       password: 'aaaaaa',
     );
-    */
   }
 
   void signUp() {
