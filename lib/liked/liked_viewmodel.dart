@@ -6,7 +6,7 @@ class LikedViewModel {
   RestaurantRepository repo = RestaurantRepository();
 
   static final LikedViewModel _instance = LikedViewModel._privateConstructor();
-  
+
   factory LikedViewModel() {
     return _instance;
   }
@@ -15,10 +15,9 @@ class LikedViewModel {
     return await repo.getAllRestaurantsMap();
   }
 
-
   // Function to cast restaurant data to List<Restaurant> and filter by liked restaurants
-  List<Restaurant> castToRestaurantList(
-      List<Map<String, dynamic>> snapshotData, List<String> likedRestaurantIds) {
+  List<Restaurant> castToRestaurantList(List<Map<String, dynamic>> snapshotData,
+      List<String> likedRestaurantIds) {
     return snapshotData.where((restaurantData) {
       return likedRestaurantIds.contains(restaurantData['id']);
     }).map((restaurantData) {
@@ -33,9 +32,9 @@ class LikedViewModel {
         placeName: restaurantData['placeName'],
         schedule:
             Map<String, Map<String, dynamic>>.from(restaurantData['schedule']),
-        id: restaurantData['id']
+        id: restaurantData['id'],
+        description: restaurantData['description'],
       );
     }).toList();
   }
-
 }

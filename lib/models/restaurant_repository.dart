@@ -22,7 +22,8 @@ class RestaurantRepository {
           placeName: restaurantData['placeName'],
           schedule: Map<String, Map<String, dynamic>>.from(
               restaurantData['schedule']),
-          id: doc.id
+          id: doc.id,
+          description: restaurantData['description'],
         );
       }).toList();
     } catch (e) {
@@ -30,6 +31,7 @@ class RestaurantRepository {
       return [];
     }
   }
+
   // Fetch all restaurants and include the restaurant ID in the returned map
   Future<List<Map<String, dynamic>>> getAllRestaurantsMap() async {
     try {
@@ -37,11 +39,12 @@ class RestaurantRepository {
 
       // Add the document ID to each restaurant's data
       return querySnapshot.docs.map((doc) {
-        Map<String, dynamic> restaurantData = doc.data() as Map<String, dynamic>;
-        restaurantData['id'] = doc.id;  // Add the restaurant's ID as a key-value pair
+        Map<String, dynamic> restaurantData =
+            doc.data() as Map<String, dynamic>;
+        restaurantData['id'] =
+            doc.id; // Add the restaurant's ID as a key-value pair
         return restaurantData;
       }).toList();
-      
     } catch (e) {
       print(e.toString());
       return [];

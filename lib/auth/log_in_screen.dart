@@ -20,7 +20,7 @@ class _LogInScreenState extends State<LogInScreen> {
   TextEditingController passwordController = TextEditingController();
 
   bool _obscurePassword = true;
-  String? _errorMessage; 
+  String? _errorMessage;
 
   void attemptSignIn() async {
     setState(() {
@@ -58,20 +58,18 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   void signInGoogle() async {
-    
     await FirebaseAuth.instance.signInWithEmailAndPassword(
       // TODO: remove
       email: 's.chamie@uniandes.edu.co',
       password: 'aaaaaa',
     );
-    
   }
 
   void signUp() {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => const RegisterScreen(),
+        builder: (context) => const RegisterScreen(),
       ),
     );
   }
@@ -141,7 +139,8 @@ class _LogInScreenState extends State<LogInScreen> {
                   decoration: InputDecoration(
                     hintText: 'Password',
                     hintStyle: const TextStyle(fontFamily: 'Poppins'),
-                    prefixIcon: const Icon(Icons.lock_outline, color: Colors.black),
+                    prefixIcon:
+                        const Icon(Icons.lock_outline, color: Colors.black),
                     suffixIcon: GestureDetector(
                       onLongPress: showPassword,
                       onLongPressUp: hidePassword,
@@ -161,7 +160,8 @@ class _LogInScreenState extends State<LogInScreen> {
                   child: FilledButton(
                     onPressed: attemptSignIn,
                     style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(const Color(0xFFD9534F)),
+                      backgroundColor:
+                          WidgetStateProperty.all(const Color(0xFFD9534F)),
                     ),
                     child: const Text('Sign In'),
                   ),
@@ -181,7 +181,11 @@ class _LogInScreenState extends State<LogInScreen> {
                 const Text.rich(TextSpan(
                   text: '────────── ', // default text style
                   children: <TextSpan>[
-                    TextSpan(text: ' OR ', style: TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: ' OR ',
+                        style: TextStyle(
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.bold)),
                     TextSpan(text: ' ──────────'),
                   ],
                 )),
@@ -211,7 +215,8 @@ class _LogInScreenState extends State<LogInScreen> {
                           fontSize: 15,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = signUp, // Call the signUp function when tapped
+                          ..onTap =
+                              signUp, // Call the signUp function when tapped
                       ),
                     ],
                   ),

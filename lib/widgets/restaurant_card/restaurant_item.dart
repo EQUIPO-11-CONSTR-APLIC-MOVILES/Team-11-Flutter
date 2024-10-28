@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restau/detail/detail_screen.dart';
 import 'package:restau/models/restaurant.dart';
 import 'package:restau/models/restaurant_viewmodel.dart';
 import 'package:restau/navigation/user_viewmodel.dart';
@@ -13,10 +14,10 @@ class RestaurantItem extends StatefulWidget {
 }
 
 class _RestaurantItemState extends State<RestaurantItem> {
-  bool isLiked = false; 
-  late UserViewModel vm; 
+  bool isLiked = false;
+  late UserViewModel vm;
   late RestaurantViewmodel rvm;
-  List<String> likedRestaurantIds = []; 
+  List<String> likedRestaurantIds = [];
 
   @override
   void initState() {
@@ -36,11 +37,11 @@ class _RestaurantItemState extends State<RestaurantItem> {
 
   void toggleLike() {
     setState(() {
-      isLiked = !isLiked; 
+      isLiked = !isLiked;
       if (isLiked) {
-        vm.likeRestaurant(widget.restaurant.getId()); 
+        vm.likeRestaurant(widget.restaurant.getId());
       } else {
-        vm.unlikeRestaurant(widget.restaurant.getId()); 
+        vm.unlikeRestaurant(widget.restaurant.getId());
       }
     });
   }
@@ -57,7 +58,16 @@ class _RestaurantItemState extends State<RestaurantItem> {
           // Wrap the image container with GestureDetector to detect taps
           GestureDetector(
             onTap: () {
-              rvm.sendPreferences(widget.restaurant.getTypes()); // Call sendPreferences when the image is tapped
+              // Navigate to the DetailScreen and pass the restaurant as a parameter
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      DetailScreen(restaurant: widget.restaurant),
+                ),
+              );
+              // Optionally, still call sendPreferences if needed
+              rvm.sendPreferences(widget.restaurant.getTypes());
             },
             child: Container(
               width: 350,
@@ -81,7 +91,9 @@ class _RestaurantItemState extends State<RestaurantItem> {
                 backgroundColor: const Color(0xFFD9534F),
                 radius: 18,
                 child: Icon(
-                  isLiked ? Icons.favorite : Icons.favorite_border, // Toggle icon
+                  isLiked
+                      ? Icons.favorite
+                      : Icons.favorite_border, // Toggle icon
                   color: Colors.white,
                 ),
               ),
@@ -173,7 +185,8 @@ class _RestaurantItemState extends State<RestaurantItem> {
                               ?.copyWith(
                                 fontSize: 16, // Set your desired font size here
                               ),
-                          overflow: TextOverflow.ellipsis, // To handle overflow gracefully
+                          overflow: TextOverflow
+                              .ellipsis, // To handle overflow gracefully
                         ),
                       ),
                     ],
@@ -185,6 +198,5 @@ class _RestaurantItemState extends State<RestaurantItem> {
         ],
       ),
     );
-
   }
 }

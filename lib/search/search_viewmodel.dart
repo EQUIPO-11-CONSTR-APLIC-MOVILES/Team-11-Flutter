@@ -81,7 +81,7 @@ class SearchViewModel extends ChangeNotifier {
       return jsonEncode(restaurant.toMap());
     }).toList();
     await prefs.setStringList('lastSearchResults', jsonList);
-    print('Save: ${jsonList}');
+    print('Save: $jsonList');
   }
 
 // Cargar resultados recientes de SharedPreferences
@@ -97,7 +97,7 @@ class SearchViewModel extends ChangeNotifier {
       _showRecentSearches = true;
     }
     notifyListeners();
-    print('Load: ${_filteredRestaurants}');
+    print('Load: $_filteredRestaurants');
   }
 
   List<Restaurant> getLastSearchResults() {
