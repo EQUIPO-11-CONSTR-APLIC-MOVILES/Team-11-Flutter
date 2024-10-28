@@ -13,8 +13,8 @@ class Restaurant {
   final String placeName;
   final Map<String, Map<String, dynamic>> schedule;
   final String id;
-
   double distance;
+  final String description;
 
   Restaurant({
     required this.averageRating,
@@ -28,6 +28,7 @@ class Restaurant {
     required this.schedule,
     required this.id,
     this.distance = 0.0,
+    required this.description,
   });
 
   factory Restaurant.fromMap(Map<String, dynamic> data) {
@@ -47,6 +48,7 @@ class Restaurant {
             MapEntry(key, Map<String, dynamic>.from(value as Map))),
       ),
       id: data['id'] as String,
+      description: data['description'] as String,
     );
   }
 
@@ -62,6 +64,7 @@ class Restaurant {
       'placeName': placeName,
       'schedule': schedule,
       'id': id,
+      'description': description,
     };
   }
 
