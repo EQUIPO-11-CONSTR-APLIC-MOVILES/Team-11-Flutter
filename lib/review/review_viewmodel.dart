@@ -6,6 +6,14 @@ class ReviewViewmodel {
   ReviewRepository repo = ReviewRepository();
   UserViewModel user = UserViewModel();
 
+  ReviewViewmodel._privateConstructor();
+
+  static final ReviewViewmodel _instance = ReviewViewmodel._privateConstructor();
+  
+  factory ReviewViewmodel() {
+    return _instance;
+  }
+
   String checkValidReview(description, rating) {
     if (description == null) {
       return 'null';
@@ -29,5 +37,9 @@ class ReviewViewmodel {
     };
     repo.registerReview(review);
 
+  }
+
+  Future<int> getReviewedPercentage() async{
+    return await repo.getReviewedPercentage(await user.getUserId());
   }
 }
