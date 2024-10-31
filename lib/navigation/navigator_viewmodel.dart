@@ -83,14 +83,16 @@ class NavigatorViewModel extends ChangeNotifier {
     PermissionStatus permissionGranted;
 
     permissionGranted = await location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      return;
-    }
 
+    if (permissionGranted == PermissionStatus.granted) {
     _currentLocation = await location.getLocation();
+
     if (_currentLocation != null && !_locationSent) {
       _sendLocationToApi();
     }
+  } else {
+    print('Location permission not granted; skipping location retrieval');
+  }
   }
 
   Future<void> _sendLocationToApi() async {
