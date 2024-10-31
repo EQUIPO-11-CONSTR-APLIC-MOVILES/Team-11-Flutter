@@ -19,4 +19,8 @@ class RestaurantViewmodel {
     // Send the formatted preferences to the repository
     repo.registerSearchType(formattedPreferences);
   }
+
+  Future<List<String>> getTopRestaurants() async{
+    return await repo.getTopRestaurants();
+  }
 }
