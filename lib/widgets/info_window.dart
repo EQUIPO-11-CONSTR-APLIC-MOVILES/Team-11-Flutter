@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restau/models/restaurant.dart';
+import 'package:restau/detail/detail_screen.dart';
 
 class CustomInfoWindow extends StatelessWidget {
   final Restaurant restaurant;
@@ -86,7 +87,12 @@ class CustomInfoWindow extends StatelessWidget {
           // Check out button
           ElevatedButton(
             onPressed: () {
-              // Add button logic here
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailScreen(restaurant: restaurant),
+                  ),
+                );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFD9534F),
