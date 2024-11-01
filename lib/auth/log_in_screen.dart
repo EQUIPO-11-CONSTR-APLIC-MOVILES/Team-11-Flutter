@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:restau/viewmodels/log_in_viewmodel.dart';
-import 'package:restau/views/register_screen.dart';
+import 'package:restau/auth/log_in_viewmodel.dart';
+import 'package:restau/auth/register_screen.dart';
 import 'package:sign_in_button/sign_in_button.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -19,35 +20,47 @@ class _LogInScreenState extends State<LogInScreen> {
   TextEditingController passwordController = TextEditingController();
 
   bool _obscurePassword = true;
-  String? _errorMessage; 
+  String? _errorMessage;
 
   void attemptSignIn() async {
     setState(() {
-      _errorMessage = null; 
+      _errorMessage = null;
     });
 
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _errorMessage = "Connect to internet and try again.";
+      });
+      return;
+    }
+
     final ans = vm.checkValidLog(passwordController.text, userController.text);
-    if (ans == "name"){
+    if (ans == "email") {
       setState(() {
-        _errorMessage = "Invalid user.";
+        _errorMessage = "Invalid email";
       });
-    } else if (ans == "password"){
+    } else if (ans == "password") {
       setState(() {
-        _errorMessage = "Invalid user.";
+        _errorMessage = "Invalid password";
       });
-    } else if (ans == "empty"){
+    } else if (ans == "empty") {
       setState(() {
-        _errorMessage = "Empty fields detected.";
+        _errorMessage = "Invalid empty fields detected";
       });
     } else {
-      vm.logIn(userController.text, passwordController.text);
+      await vm.logIn(userController.text, passwordController.text);
+      await Future.delayed(const Duration(seconds: 2));
+      setState(() {
+        _errorMessage = "Invalid email or password";
+      });
     }
   }
 
   void signInGoogle() async {
     await FirebaseAuth.instance.signInWithEmailAndPassword(
       // TODO: remove
-      email: 'a@a.com',
+      email: 's.chamie@uniandes.edu.co',
       password: 'aaaaaa',
     );
   }
@@ -56,7 +69,7 @@ class _LogInScreenState extends State<LogInScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => const RegisterScreen(),
+        builder: (context) => const RegisterScreen(),
       ),
     );
   }
@@ -126,7 +139,8 @@ class _LogInScreenState extends State<LogInScreen> {
                   decoration: InputDecoration(
                     hintText: 'Password',
                     hintStyle: const TextStyle(fontFamily: 'Poppins'),
-                    prefixIcon: const Icon(Icons.lock_outline, color: Colors.black),
+                    prefixIcon:
+                        const Icon(Icons.lock_outline, color: Colors.black),
                     suffixIcon: GestureDetector(
                       onLongPress: showPassword,
                       onLongPressUp: hidePassword,
@@ -146,19 +160,28 @@ class _LogInScreenState extends State<LogInScreen> {
                   child: FilledButton(
                     onPressed: attemptSignIn,
                     style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(const Color(0xFFD9534F)),
+                      backgroundColor:
+                          WidgetStateProperty.all(const Color(0xFFD9534F)),
                     ),
                     child: const Text('Sign In'),
                   ),
                 ),
                 // Error message shown if sign-in fails
                 if (_errorMessage != null) ...[
-                  Text(
-                    _errorMessage!,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontFamily: 'Poppins',
-                      fontSize: 14,
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.info_outline, color: Colors.red,),
+                        Text(
+                          _errorMessage!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -166,7 +189,11 @@ class _LogInScreenState extends State<LogInScreen> {
                 const Text.rich(TextSpan(
                   text: '────────── ', // default text style
                   children: <TextSpan>[
-                    TextSpan(text: ' OR ', style: TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: ' OR ',
+                        style: TextStyle(
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.bold)),
                     TextSpan(text: ' ──────────'),
                   ],
                 )),
@@ -196,7 +223,8 @@ class _LogInScreenState extends State<LogInScreen> {
                           fontSize: 15,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = signUp, // Call the signUp function when tapped
+                          ..onTap =
+                              signUp, // Call the signUp function when tapped
                       ),
                     ],
                   ),

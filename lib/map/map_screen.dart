@@ -1,10 +1,13 @@
+// map_screen.dart
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:restau/viewmodels/map_viewmodel.dart';
+import 'package:restau/map/map_viewmodel.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:restau/models/restaurant_marker_adapter.dart';
+import 'package:restau/map/restaurant_marker_adapter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -15,23 +18,56 @@ class MapScreen extends StatefulWidget {
 
 class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
   late MapViewModel viewModel;
+  BitmapDescriptor? newRestaurantIcon;
+
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  bool _isConnected = true;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this); // Add observer to listen for app state changes
+    WidgetsBinding.instance.addObserver(this);
+    _loadMarkerIcons();
+    _initConnectivity();
+  }
+
+  Future<void> _loadMarkerIcons() async {
+    final icon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(48, 48)),
+      'lib/assets/drawable/marker_new.png',
+    );
+    setState(() {
+      newRestaurantIcon = icon;
+    });
+  }
+
+  Future<void> _initConnectivity() async {
+    try {
+      ConnectivityResult result = await _connectivity.checkConnectivity();
+      _updateConnectionStatus(result);
+    } catch (e) {
+      print(e.toString());
+    }
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  void _updateConnectionStatus(ConnectivityResult result) {
+    setState(() {
+      _isConnected = result != ConnectivityResult.none;
+    });
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this); // Clean up the observer when the widget is disposed
+    WidgetsBinding.instance.removeObserver(this);
+    _connectivitySubscription.cancel();
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // When the app resumes, check for permissions again
       _checkPermissions();
     }
     super.didChangeAppLifecycleState(state);
@@ -40,7 +76,7 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
   Future<void> _checkPermissions() async {
     final status = await Permission.locationWhenInUse.status;
     if (status.isGranted) {
-      viewModel.requestPermission(); // Update the viewModel when permissions are granted
+      viewModel.requestPermission();
     }
   }
 
@@ -54,6 +90,31 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
       child: Scaffold(
         body: Consumer<MapViewModel>(
           builder: (context, viewModel, child) {
+            if (!_isConnected) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.signal_wifi_off,
+                      size: 65,
+                      color: Colors.grey,
+                    ),
+                    SizedBox(height: 16.0),
+                    Text(
+                      'The map does not work without an internet connection.',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontFamily: 'Poppins',
+                        fontSize: 22.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }
             if (viewModel.state.isCheckingPermissions) {
               return const Center(child: CircularProgressIndicator());
             }
@@ -97,7 +158,7 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
           ElevatedButton(
             onPressed: viewModel.openAppSettings,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD9534F), // Set the background color here
+              backgroundColor: const Color(0xFFD9534F),
             ),
             child: const Text(
               "Give Permissions",
@@ -109,7 +170,6 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
               ),
               textAlign: TextAlign.center,
             ),
-            
           ),
         ],
       ),
@@ -135,7 +195,11 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
         ),
       },
       markers: viewModel.state.nearRestaurants.map((restaurant) {
-        RestaurantMarkerAdapter adapter = RestaurantMarkerAdapter(restaurant: restaurant, context: context);
+        RestaurantMarkerAdapter adapter = RestaurantMarkerAdapter(
+          restaurant: restaurant,
+          context: context,
+          newRestaurantIcon: newRestaurantIcon,
+        );
         return adapter.toMarker();
       }).toSet(),
     );
@@ -174,7 +238,7 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
             Slider(
               value: viewModel.state.circleRadius,
               min: 0,
-              max: 1.5,
+              max: 0.6,
               divisions: 99,
               label: viewModel.state.circleRadius.toStringAsFixed(1),
               onChanged: (value) {

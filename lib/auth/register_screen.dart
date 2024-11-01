@@ -1,8 +1,9 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:restau/viewmodels/log_in_viewmodel.dart';
-import 'package:restau/views/auth_screen.dart';
-import 'package:restau/views/set_preferences_screen.dart';
+import 'package:restau/auth/register_viewmodel.dart';
+import 'package:restau/auth/auth_screen.dart';
+import 'package:restau/auth/set_preferences_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,7 +16,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController mailController = TextEditingController();
-  LogInViewmodel vm = LogInViewmodel();
+  RegisterViewModel vm = RegisterViewModel();
 
   bool obscurePassword = true;
   String? errorMessage; 
@@ -45,6 +46,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() {
       errorMessage = null; 
     });
+
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        errorMessage = "Connect to internet and try again.";
+      });
+      return;
+    }
 
     final ans = await vm.checkValidNewUser(mailController.text,passwordController.text, userController.text);
     if (ans == "email"){
@@ -166,13 +175,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 // Error message shown if sign-in fails
                 if (errorMessage != null) ...[
-                  Text(
-                    errorMessage!,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontFamily: 'Poppins',
-                      fontSize: 14,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.info_outline, color: Colors.red),
+                      Text(
+                        errorMessage!,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
                 SizedBox(height: elementSpacing),

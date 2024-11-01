@@ -1,13 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';  // Add provider package
-import 'package:restau/viewmodels/log_in_viewmodel.dart';
-import 'package:restau/viewmodels/user.dart';
-import '../viewmodels/navigator_viewmodel.dart'; 
-import 'home_screen.dart';
-import 'random_screen.dart';
-import 'search_screen.dart';
-import 'liked_screen.dart';
-import 'map_screen.dart';
+import 'package:provider/provider.dart'; // Add provider package
+import 'package:restau/navigation/user_viewmodel.dart';
+import 'package:restau/search/search_view.dart';
+import 'navigator_viewmodel.dart';
+import '../home/home_screen.dart';
+import '../views/random_screen.dart';
+import '../liked/liked_screen.dart';
+import '../map/map_screen.dart';
+
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({super.key});
@@ -17,9 +18,7 @@ class NavigatorScreen extends StatefulWidget {
 }
 
 class NavigatorScreenState extends State<NavigatorScreen> {
-  
-  User activeUser = User();
-  LogInViewmodel livm = LogInViewmodel();
+  UserViewModel activeUser = UserViewModel();
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
@@ -36,6 +35,7 @@ class NavigatorScreenState extends State<NavigatorScreen> {
       create: (context) => NavigatorViewModel(),
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
@@ -55,7 +55,7 @@ class NavigatorScreenState extends State<NavigatorScreen> {
                     onTap: () => _showLogoutMenu(context),
                     child: CircleAvatar(
                       backgroundImage: profilePicUrl != null
-                          ? NetworkImage(profilePicUrl)
+                          ? CachedNetworkImageProvider(profilePicUrl)
                           : null,
                       radius: 20,
                       child: profilePicUrl == null
@@ -80,6 +80,12 @@ class NavigatorScreenState extends State<NavigatorScreen> {
           // Listen to changes in the selectedIndex from the NavigatorViewModel
           child: Consumer<NavigatorViewModel>(
             builder: (context, vm, child) {
+              // Check if apiMessage is not empty and show a popup
+              if (vm.apiMessage.isNotEmpty) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _showApiMessagePopup(context, vm);
+                });
+              }
               return _widgetOptions.elementAt(vm.selectedIndex);
             },
           ),
@@ -135,9 +141,64 @@ class NavigatorScreenState extends State<NavigatorScreen> {
       ],
     ).then((value) {
       if (value == 'logout') {
-        livm.logOut();
+        activeUser.logOut();
         // Optionally, navigate to the login screen or show a snackbar
       }
     });
+  }
+
+  void _showApiMessagePopup(BuildContext context, NavigatorViewModel vm) {
+    String message = vm.apiMessage;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.fromLTRB(
+              24.0, 24.0, 24.0, 24.0), // Adjusts the padding
+          content: Padding(
+            padding: const EdgeInsets.only(
+                top: 20.0), // Custom top padding for the message
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Color(0xFF2F2F2F),
+                fontSize: 16,
+                fontFamily: "Poppins",
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Dismiss',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                  )),
+              onPressed: () {
+                vm.apiMessage = '';
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text("Let's go!",
+                  style: TextStyle(
+                    color: Color(0xFFD9534F),
+                    fontSize: 16,
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                  )),
+              onPressed: () {
+                vm.apiMessage = '';
+                Navigator.of(context).pop();
+                vm.onItemTapped(4);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

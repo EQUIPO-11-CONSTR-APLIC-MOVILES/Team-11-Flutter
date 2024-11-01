@@ -1,21 +1,50 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as location_pkg;
 import 'package:permission_handler/permission_handler.dart' as permission_handler_pkg;
-import 'package:restau/models/map_state.dart';
-import '../models/firestore_service.dart';
+import 'package:restau/map/map_state.dart';
 import 'package:restau/models/restaurant.dart';
+import 'package:restau/models/restaurant_repository.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class MapViewModel extends ChangeNotifier {
-  final FirestoreService _firestoreService = FirestoreService();
+  final RestaurantRepository repo = RestaurantRepository();
   MapState _state = MapState();
   MapState get state => _state;
   final location_pkg.Location _location = location_pkg.Location();
   bool _initialLocationSet = false;
 
+  final Connectivity _connectivity = Connectivity();
+  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+
   MapViewModel() {
     requestPermission();
     fetchRestaurants();
+    _initConnectivity();
+  }
+
+  Future<void> _initConnectivity() async {
+    ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+      _updateConnectionStatus(result);
+    } catch (e) {
+      print(e.toString());
+    }
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  void _updateConnectionStatus(ConnectivityResult result) {
+    bool isConnected = result != ConnectivityResult.none;
+    _state = _state.copyWith(isConnected: isConnected);
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> requestPermission() async {
@@ -40,18 +69,22 @@ class MapViewModel extends ChangeNotifier {
       }
     }
 
-    _location.onLocationChanged.listen((location_pkg.LocationData currentLocation) {
+    _location.onLocationChanged
+        .listen((location_pkg.LocationData currentLocation) {
       if (!_initialLocationSet) {
         _state = _state.copyWith(
-          userLocation: LatLng(currentLocation.latitude!, currentLocation.longitude!),
-          circleLocation: LatLng(currentLocation.latitude!, currentLocation.longitude!),
+          userLocation:
+              LatLng(currentLocation.latitude!, currentLocation.longitude!),
+          circleLocation:
+              LatLng(currentLocation.latitude!, currentLocation.longitude!),
           permissionsGranted: true,
           isCheckingPermissions: false,
         );
         _initialLocationSet = true;
       } else {
         _state = _state.copyWith(
-          circleLocation: LatLng(currentLocation.latitude!, currentLocation.longitude!),
+          circleLocation:
+              LatLng(currentLocation.latitude!, currentLocation.longitude!),
           permissionsGranted: true,
           isCheckingPermissions: false,
         );
@@ -66,9 +99,7 @@ class MapViewModel extends ChangeNotifier {
 
   void _updatePermissionStatus(bool permissionsGranted) {
     _state = _state.copyWith(
-      permissionsGranted: permissionsGranted,
-      isCheckingPermissions: false
-    );
+        permissionsGranted: permissionsGranted, isCheckingPermissions: false);
     notifyListeners();
   }
 
@@ -85,16 +116,17 @@ class MapViewModel extends ChangeNotifier {
   Future<void> fetchRestaurants() async {
     _state = _state.copyWith(isCheckingPermissions: true);
 
-    final restaurants = await _firestoreService.getAllRestaurants();
+    final restaurants = await repo.getAllRestaurantsMap();
     _state = _state.copyWith(
-      restaurants: restaurants.map((data) => Restaurant.fromMap(data)).toList()
-    );
+        restaurants:
+            restaurants.map((data) => Restaurant.fromMap(data)).toList());
   }
 
   void updateRestaurantDistances(location_pkg.LocationData currentLocation) {
     List<Restaurant> modifiableList = List.from(_state.restaurants);
     for (final restaurant in modifiableList) {
-      restaurant.calculateDistance(LatLng(currentLocation.latitude!, currentLocation.longitude!));
+      restaurant.calculateDistance(
+          LatLng(currentLocation.latitude!, currentLocation.longitude!));
     }
     modifiableList.sort((a, b) => a.distance.compareTo(b.distance));
     _state = _state.copyWith(restaurants: modifiableList);
@@ -121,6 +153,7 @@ class MapViewModel extends ChangeNotifier {
 
   void updateShownRestaurants() {
     int index = _binarySearch(_state.restaurants);
-  _state = _state.copyWith(nearRestaurants: _state.restaurants.sublist(0, index));
+    _state =
+        _state.copyWith(nearRestaurants: _state.restaurants.sublist(0, index));
   }
 }

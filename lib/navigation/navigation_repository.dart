@@ -1,18 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FirestoreService {
+class NavigationRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-
-  // Fetch all restaurants
-  Future<List<Map<String, dynamic>>> getAllRestaurants() async {
-    try {
-      QuerySnapshot querySnapshot = await _db.collection('restaurants').get();
-      return querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-    } catch (e) {
-      print(e.toString());
-      return [];
-    }
-  }
 
   Future<String> addNavigationPath(String path) async {
     try {
@@ -21,8 +10,6 @@ class FirestoreService {
       });
       return docRef.id;
     } catch (e) {
-      // TODO: No imprimir
-      print(e.toString());
       return "";
     }
   }
@@ -33,7 +20,7 @@ class FirestoreService {
         'path': newPath,
       });
     } catch (e) {
-      print(e.toString());
+      return;
     }
   }
 }
