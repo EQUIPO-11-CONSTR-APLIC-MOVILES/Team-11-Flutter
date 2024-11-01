@@ -175,13 +175,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 // Error message shown if sign-in fails
                 if (errorMessage != null) ...[
-                  Text(
-                    errorMessage!,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontFamily: 'Poppins',
-                      fontSize: 14,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.info_outline, color: Colors.red),
+                      Text(
+                        errorMessage!,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
                 SizedBox(height: elementSpacing),

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts
 import 'package:restau/models/restaurant.dart';
@@ -83,64 +84,71 @@ class _DetailScreenState extends State<DetailScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              child: Image.network(widget.restaurant.imageUrl),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.restaurant.name,
-                    style: GoogleFonts.poppins(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Row(
-                    children: [
-                      Text(
-                        widget.restaurant.averageRating.toString(),
-                        style: GoogleFonts.poppins(fontSize: 16),
-                      ),
-                      const SizedBox(width: 8.0),
-                      Row(
-                        children: List.generate(5, (index) {
-                          return Icon(
-                            index < widget.restaurant.averageRating
-                                ? Icons.star
-                                : Icons.star_border,
-                            color: const Color.fromARGB(252, 255, 215, 173),
-                          );
-                        }),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16.0),
-                  IconsRow(restaurant: widget.restaurant),
-                  const SizedBox(height: 16.0),
-                  Text(
-                    widget.restaurant.description,
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: const Color.fromARGB(222, 130, 126, 126),
-                    ),
-                    textAlign: TextAlign.justify,
-                  ),
-                  const SizedBox(height: 16.0),
-                  TagSection(tags: widget.restaurant.categories),
-                ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: CachedNetworkImage(
+              imageUrl: widget.restaurant.imageUrl,
+              placeholder: (context, url) => const Center(
+                child: CircularProgressIndicator(),
               ),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+              fit: BoxFit.cover, // This will ensure the image covers the width
             ),
-          ],
-        ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.restaurant.name,
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8.0),
+                Row(
+                  children: [
+                    Text(
+                      widget.restaurant.averageRating.toString(),
+                      style: GoogleFonts.poppins(fontSize: 16),
+                    ),
+                    const SizedBox(width: 8.0),
+                    Row(
+                      children: List.generate(5, (index) {
+                        return Icon(
+                          index < widget.restaurant.averageRating
+                              ? Icons.star
+                              : Icons.star_border,
+                          color: const Color.fromARGB(252, 255, 215, 173),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16.0),
+                IconsRow(restaurant: widget.restaurant),
+                const SizedBox(height: 16.0),
+                Text(
+                  widget.restaurant.description,
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: const Color.fromARGB(222, 130, 126, 126),
+                  ),
+                  textAlign: TextAlign.justify,
+                ),
+                const SizedBox(height: 16.0),
+                TagSection(tags: widget.restaurant.categories),
+              ],
+            ),
+          ),
+        ],
       ),
+    ),
       floatingActionButton: FloatingActionButton(
         onPressed: toggleLike,
         shape: RoundedRectangleBorder(

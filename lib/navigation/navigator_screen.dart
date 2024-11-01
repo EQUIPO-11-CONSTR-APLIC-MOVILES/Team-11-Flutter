@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Add provider package
 import 'package:restau/navigation/user_viewmodel.dart';
@@ -7,6 +8,7 @@ import '../home/home_screen.dart';
 import '../views/random_screen.dart';
 import '../liked/liked_screen.dart';
 import '../map/map_screen.dart';
+
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({super.key});
@@ -53,7 +55,7 @@ class NavigatorScreenState extends State<NavigatorScreen> {
                     onTap: () => _showLogoutMenu(context),
                     child: CircleAvatar(
                       backgroundImage: profilePicUrl != null
-                          ? NetworkImage(profilePicUrl)
+                          ? CachedNetworkImageProvider(profilePicUrl)
                           : null,
                       radius: 20,
                       child: profilePicUrl == null

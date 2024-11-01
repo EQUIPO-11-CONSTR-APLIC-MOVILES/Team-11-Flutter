@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:restau/detail/detail_screen.dart';
 import 'package:restau/models/restaurant.dart';
@@ -15,6 +16,7 @@ class RestaurantItem extends StatefulWidget {
 
 class _RestaurantItemState extends State<RestaurantItem> {
   bool isLiked = false;
+  bool isTop = false;
   late UserViewModel vm;
   late RestaurantViewmodel rvm;
   List<String> likedRestaurantIds = [];
@@ -25,6 +27,7 @@ class _RestaurantItemState extends State<RestaurantItem> {
     vm = UserViewModel();
     rvm = RestaurantViewmodel();
     fetchLikedRestaurants();
+    checkIfTopRestaurant();
   }
 
   Future<void> fetchLikedRestaurants() async {
@@ -32,6 +35,14 @@ class _RestaurantItemState extends State<RestaurantItem> {
     likedRestaurantIds = await vm.getLikedRestaurants();
     setState(() {
       isLiked = likedRestaurantIds.contains(widget.restaurant.getId());
+    });
+  }
+
+  Future<void> checkIfTopRestaurant() async {
+    // Fetch top restaurant names and check if this restaurant's name is in the list
+    List<String> topRestaurants = await rvm.getTopRestaurants();
+    setState(() {
+      isTop = topRestaurants.contains(widget.restaurant.name);
     });
   }
 
@@ -75,7 +86,7 @@ class _RestaurantItemState extends State<RestaurantItem> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 image: DecorationImage(
-                  image: NetworkImage(widget.restaurant.imageUrl),
+                  image: CachedNetworkImageProvider(widget.restaurant.imageUrl),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -99,10 +110,31 @@ class _RestaurantItemState extends State<RestaurantItem> {
               ),
             ),
           ),
+          // "Top" label in top-right corner, positioned below the "New" label
+          if (isTop)
+            Positioned(
+              top: 10, // Adjust position if "New" label is also present
+              right: 10,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFEEAD), // Yellow background for "Top" label
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: const Text(
+                  'Top',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
           // "New" label in top-right corner
           if (isNew)
             Positioned(
-              top: 10,
+              top: isTop ? 50 : 10,
               right: 10,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -120,7 +152,7 @@ class _RestaurantItemState extends State<RestaurantItem> {
                 ),
               ),
             ),
-          // Restaurant information card
+
           Positioned(
             bottom: 30, // Align it to the bottom of the image
             left: 60, // Extend to the full width of the image container
