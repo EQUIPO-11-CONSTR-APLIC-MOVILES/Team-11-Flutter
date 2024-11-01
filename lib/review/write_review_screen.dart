@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:restau/navigation/user_viewmodel.dart';
 import 'package:restau/review/review_viewmodel.dart';
@@ -15,69 +17,117 @@ class WriteReviewScreen extends StatefulWidget {
 
 class _WriteReviewScreenState extends State<WriteReviewScreen> {
   double elementSpacing = 15;
-
   final starController = StarRatingController();
+  final UserViewModel user = UserViewModel();
+  final ReviewViewmodel vm = ReviewViewmodel();
+  final TextEditingController reviewController = TextEditingController();
+  final ValueNotifier<String?> _errorMessage = ValueNotifier(null);
+  StreamSubscription? connectivitySubscription;
+  bool isOffline = false;
 
-  UserViewModel user = UserViewModel();
-  ReviewViewmodel vm = ReviewViewmodel();
-
-  TextEditingController reviewController = TextEditingController();
-
-  void sendReview() async {
-    if (vm.checkValidReview(reviewController.text, starController.rating) == 'valid'){
-      vm.registerReview(
-        await user.getUserName(), 
-        await user.getUserPic(), 
-        reviewController.text, 
-        starController.rating, 
-        widget.restaurant
-      );
-    }
-    navigateBack();
+  @override
+  void initState() {
+    super.initState();
+    // Check connectivity status initially and listen for changes
+    connectivitySubscription = Connectivity().onConnectivityChanged.listen((status) {
+      setState(() {
+        isOffline = status == ConnectivityResult.none;
+      });
+    });
   }
 
-  void navigateBack(){
-    //TODO: volver al detalle cuando se haya escrito el review
+  @override
+  void dispose() {
+    connectivitySubscription?.cancel();
+    reviewController.dispose();
+    _errorMessage.dispose();
+    super.dispose();
+  }
+
+  void sendReview() async {
+    String res = vm.checkValidReview(reviewController.text, starController.rating);
+    if (res == 'valid') {
+      final userName = await user.getUserName();
+      final userPic = await user.getUserPic();
+
+      if (true) {
+        // Show offline message in a dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("No Internet Connection"),
+              content: const Text(
+                "You have no internet connection, but your review will be saved and posted once you regain connection.",
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog first
+                    navigateBack(); // Then navigate back
+                  },
+                  child: const Text(
+                    'Ok',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        navigateBack();
+      }
+      
+      // Send review (handles offline saving in ViewModel)
+      vm.registerReview(userName, userPic, reviewController.text, starController.rating, widget.restaurant);
+    } else if (res == 'length') {
+      _errorMessage.value = "Please add a review before sending";
+    } else if (res == 'rating') {
+      _errorMessage.value = "Please add a star rating before sending";
+    }
+  }
+
+
+  void navigateBack() {
     starController.rating = 0;
     reviewController.text = "";
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.wait([user.getUserPic(), user.getUserName()]), // Get both user pic and name
+      future: Future.wait([user.getUserPic(), user.getUserName()]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return const Center(child: Text('Error loading user info'));
         } else {
-          final userPic = snapshot.data?[0]; // Picture URL
-          final userName = snapshot.data?[1]; // Username
+          final userPic = snapshot.data?[0];
+          final userName = snapshot.data?[1];
 
           return Padding(
-            padding: const EdgeInsets.only(left:32.0, right: 32.0),
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: Column(
               children: [
                 Row(
                   children: [
                     Text(
-                      userName ?? 'User', // Fallback if no name
+                      userName ?? 'User',
                       style: const TextStyle(fontSize: 18, fontFamily: 'Poppins', fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     CircleAvatar(
-                      backgroundImage: userPic != null
-                          ? NetworkImage(userPic)
-                          : null, // Fallback if no pic
-                      radius: 25, // Size of the avatar
+                      backgroundImage: userPic != null ? NetworkImage(userPic) : null,
+                      radius: 25,
                     ),
                     const Spacer(),
-                    RatingStars(controller: starController), 
+                    RatingStars(controller: starController),
                   ],
                 ),
                 SizedBox(height: elementSpacing),
@@ -88,10 +138,30 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                   decoration: const InputDecoration(
                     hintText: 'Share details of your own experience here',
                     hintStyle: TextStyle(fontFamily: "Poppins", color: Colors.grey),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
+                    border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
                   ),
+                ),
+                ValueListenableBuilder<String?>(
+                  valueListenable: _errorMessage,
+                  builder: (context, error, child) {
+                    if (error == null) return SizedBox.shrink();
+                    return Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.info_outline, color: Colors.red),
+                          Text(
+                            error,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontFamily: 'Poppins',
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
                 SizedBox(height: elementSpacing),
                 SizedBox(
@@ -99,7 +169,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                   child: FilledButton(
                     onPressed: sendReview,
                     style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(const Color(0xFFD9534F)),
+                      backgroundColor: MaterialStateProperty.all(const Color(0xFFD9534F)),
                     ),
                     child: const Text('Submit'),
                   ),
