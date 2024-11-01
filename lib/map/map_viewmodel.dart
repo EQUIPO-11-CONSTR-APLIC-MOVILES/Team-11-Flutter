@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as location_pkg;
-import 'package:permission_handler/permission_handler.dart'
-    as permission_handler_pkg;
+import 'package:permission_handler/permission_handler.dart' as permission_handler_pkg;
 import 'package:restau/map/map_state.dart';
 import 'package:restau/models/restaurant.dart';
 import 'package:restau/models/restaurant_repository.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class MapViewModel extends ChangeNotifier {
   final RestaurantRepository repo = RestaurantRepository();
@@ -14,9 +15,36 @@ class MapViewModel extends ChangeNotifier {
   final location_pkg.Location _location = location_pkg.Location();
   bool _initialLocationSet = false;
 
+  final Connectivity _connectivity = Connectivity();
+  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+
   MapViewModel() {
     requestPermission();
     fetchRestaurants();
+    _initConnectivity();
+  }
+
+  Future<void> _initConnectivity() async {
+    ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+      _updateConnectionStatus(result);
+    } catch (e) {
+      print(e.toString());
+    }
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  void _updateConnectionStatus(ConnectivityResult result) {
+    bool isConnected = result != ConnectivityResult.none;
+    _state = _state.copyWith(isConnected: isConnected);
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> requestPermission() async {

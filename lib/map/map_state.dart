@@ -1,3 +1,4 @@
+// map_state.dart
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:restau/models/restaurant.dart';
 
@@ -9,6 +10,7 @@ class MapState {
   final LatLng circleLocation;
   final double circleRadius;
   final bool isCheckingPermissions;
+  final bool isConnected;
 
   MapState({
     this.userLocation = const LatLng(4.603096177609384, -74.06584744436493),
@@ -18,6 +20,7 @@ class MapState {
     this.circleLocation = const LatLng(4.603096177609384, -74.06584744436493),
     this.circleRadius = 0,
     this.isCheckingPermissions = true,
+    this.isConnected = true,
   });
 
   MapState copyWith({
@@ -28,6 +31,7 @@ class MapState {
     LatLng? circleLocation,
     double? circleRadius,
     bool? isCheckingPermissions,
+    bool? isConnected,
   }) {
     return MapState(
       userLocation: userLocation ?? this.userLocation,
@@ -37,6 +41,7 @@ class MapState {
       circleLocation: circleLocation ?? this.circleLocation,
       circleRadius: circleRadius ?? this.circleRadius,
       isCheckingPermissions: isCheckingPermissions ?? this.isCheckingPermissions,
+      isConnected: isConnected ?? this.isConnected,
     );
   }
 }
