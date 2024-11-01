@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:restau/detail/detail_screen.dart';
 import 'package:restau/models/restaurant.dart';
@@ -85,7 +86,7 @@ class _RestaurantItemState extends State<RestaurantItem> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 image: DecorationImage(
-                  image: NetworkImage(widget.restaurant.imageUrl),
+                  image: CachedNetworkImageProvider(widget.restaurant.imageUrl),
                   fit: BoxFit.cover,
                 ),
               ),
