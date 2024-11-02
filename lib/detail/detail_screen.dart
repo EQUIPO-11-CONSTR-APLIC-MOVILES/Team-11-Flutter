@@ -7,6 +7,7 @@ import 'package:restau/navigation/user_viewmodel.dart';
 import 'package:restau/widgets/detail_options.dart';
 import 'package:restau/widgets/restaurant_tags.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class DetailScreen extends StatefulWidget {
   final Restaurant restaurant;
@@ -50,13 +51,40 @@ class _DetailScreenState extends State<DetailScreen> {
     });
   }
 
-  Future<void> _launchMapsUrl(double lat, double lon) async {
-    final url = 'https://www.google.com/maps/search/?api=1&query=$lat,$lon';
+  Future<void> _launchMapsUrl(double latitude, double longitude) async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      _showNoConnectionDialog();
+      return;
+    }
+
+    final url =
+        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
       throw 'Could not launch $url';
     }
+  }
+
+  void _showNoConnectionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('No Internet Connection'),
+          content: Text('Please check your internet connection and try again.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -84,71 +112,72 @@ class _DetailScreenState extends State<DetailScreen> {
         ],
       ),
       body: SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: CachedNetworkImage(
-              imageUrl: widget.restaurant.imageUrl,
-              placeholder: (context, url) => const Center(
-                child: CircularProgressIndicator(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: CachedNetworkImage(
+                imageUrl: widget.restaurant.imageUrl,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+                fit:
+                    BoxFit.cover, // This will ensure the image covers the width
               ),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-              fit: BoxFit.cover, // This will ensure the image covers the width
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.restaurant.name,
-                  style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Row(
-                  children: [
-                    Text(
-                      widget.restaurant.averageRating.toString(),
-                      style: GoogleFonts.poppins(fontSize: 16),
+            Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.restaurant.name,
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(width: 8.0),
-                    Row(
-                      children: List.generate(5, (index) {
-                        return Icon(
-                          index < widget.restaurant.averageRating
-                              ? Icons.star
-                              : Icons.star_border,
-                          color: const Color.fromARGB(252, 255, 215, 173),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16.0),
-                IconsRow(restaurant: widget.restaurant),
-                const SizedBox(height: 16.0),
-                Text(
-                  widget.restaurant.description,
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: const Color.fromARGB(222, 130, 126, 126),
                   ),
-                  textAlign: TextAlign.justify,
-                ),
-                const SizedBox(height: 16.0),
-                TagSection(tags: widget.restaurant.categories),
-              ],
+                  const SizedBox(height: 8.0),
+                  Row(
+                    children: [
+                      Text(
+                        widget.restaurant.averageRating.toString(),
+                        style: GoogleFonts.poppins(fontSize: 16),
+                      ),
+                      const SizedBox(width: 8.0),
+                      Row(
+                        children: List.generate(5, (index) {
+                          return Icon(
+                            index < widget.restaurant.averageRating
+                                ? Icons.star
+                                : Icons.star_border,
+                            color: const Color.fromARGB(252, 255, 215, 173),
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16.0),
+                  IconsRow(restaurant: widget.restaurant),
+                  const SizedBox(height: 16.0),
+                  Text(
+                    widget.restaurant.description,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: const Color.fromARGB(222, 130, 126, 126),
+                    ),
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(height: 16.0),
+                  TagSection(tags: widget.restaurant.categories),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
       floatingActionButton: FloatingActionButton(
         onPressed: toggleLike,
         shape: RoundedRectangleBorder(
