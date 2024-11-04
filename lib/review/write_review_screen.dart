@@ -5,12 +5,16 @@ import 'package:restau/navigation/user_viewmodel.dart';
 import 'package:restau/review/review_viewmodel.dart';
 import 'package:restau/widgets/rating_stars.dart';
 import 'package:restau/widgets/star_rating_controller.dart';
+import 'package:restau/random/random_repository.dart';
 
 class WriteReviewScreen extends StatefulWidget {
-  const WriteReviewScreen({super.key, required this.restaurant, this.initialRating = 0});
+  WriteReviewScreen({super.key, required this.restaurant, this.initialRating = 0, this.randomReviewDocumentId = ""});
 
   final String restaurant;
   final int initialRating;
+  final String randomReviewDocumentId;
+
+  final RandomRepository randomRepository = RandomRepository();
 
   @override
   State<WriteReviewScreen> createState() => _WriteReviewScreenState();
@@ -83,6 +87,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
       
       // Send review (handles offline saving in ViewModel)
       vm.registerReview(userName, userPic, reviewController.text, starController.rating, widget.restaurant);
+      widget.randomRepository.updateRandomReview(widget.randomReviewDocumentId);
     } else if (res == 'length') {
       _errorMessage.value = "Please add a review before sending";
     } else if (res == 'rating') {

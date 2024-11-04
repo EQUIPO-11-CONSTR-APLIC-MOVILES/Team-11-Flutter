@@ -6,8 +6,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ReviewListScreen extends StatefulWidget {
   final String restaurantID;
+  final String randomReviewDocumentId;
 
-  const ReviewListScreen({super.key, required this.restaurantID});
+  const ReviewListScreen({super.key, required this.restaurantID,this.randomReviewDocumentId = ""});
 
   @override
   _ReviewListScreenState createState() => _ReviewListScreenState();
@@ -46,6 +47,7 @@ class _ReviewListScreenState extends State<ReviewListScreen> {
                   controller: StarRatingController(),
                   size: 30.0,
                   restaurantID: widget.restaurantID,
+                  randomReviewDocumentId: widget.randomReviewDocumentId,
                 ),
                 const Divider(),
               ],

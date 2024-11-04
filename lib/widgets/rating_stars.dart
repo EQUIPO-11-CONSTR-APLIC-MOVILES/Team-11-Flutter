@@ -7,6 +7,7 @@ class RatingStars extends StatefulWidget {
   final double size;
   final bool grey; // Size of the stars
   final String restaurantID;
+  final String randomReviewDocumentId;
   final StarRatingController? controller; // Optional controller to manage the rating
 
   const RatingStars({
@@ -15,6 +16,7 @@ class RatingStars extends StatefulWidget {
     this.size = 50.0, 
     this.grey = false, // Default star size
     this.restaurantID = "",
+    this.randomReviewDocumentId = "",
     this.controller, // Controller is optional
   });
 
@@ -65,6 +67,7 @@ class _RatingStarsState extends State<RatingStars> {
                           child: WriteReviewScreen(
                             restaurant: widget.restaurantID,
                             initialRating: index + 1,
+                            randomReviewDocumentId: widget.randomReviewDocumentId,
                           ),
                         ),
                       ),
