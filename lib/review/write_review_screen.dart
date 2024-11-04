@@ -7,9 +7,10 @@ import 'package:restau/widgets/rating_stars.dart';
 import 'package:restau/widgets/star_rating_controller.dart';
 
 class WriteReviewScreen extends StatefulWidget {
-  const WriteReviewScreen({super.key, required this.restaurant});
+  const WriteReviewScreen({super.key, required this.restaurant, this.initialRating = 0});
 
   final String restaurant;
+  final int initialRating;
 
   @override
   State<WriteReviewScreen> createState() => _WriteReviewScreenState();
@@ -17,7 +18,7 @@ class WriteReviewScreen extends StatefulWidget {
 
 class _WriteReviewScreenState extends State<WriteReviewScreen> {
   double elementSpacing = 15;
-  final starController = StarRatingController();
+  late final StarRatingController starController;
   final UserViewModel user = UserViewModel();
   final ReviewViewmodel vm = ReviewViewmodel();
   final TextEditingController reviewController = TextEditingController();
@@ -28,6 +29,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
   @override
   void initState() {
     super.initState();
+    starController = StarRatingController(widget.initialRating);
     // Check connectivity status initially and listen for changes
     connectivitySubscription = Connectivity().onConnectivityChanged.listen((status) {
       setState(() {
@@ -87,7 +89,6 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
       _errorMessage.value = "Please add a star rating before sending";
     }
   }
-
 
   void navigateBack() {
     starController.rating = 0;

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:restau/review/write_review_screen.dart';
 import 'package:restau/widgets/star_rating_controller.dart';
 
 class RatingStars extends StatefulWidget {
   final bool fixed; // If true, stars are not interactive
   final double size;
   final bool grey; // Size of the stars
+  final String restaurantID;
   final StarRatingController? controller; // Optional controller to manage the rating
 
   const RatingStars({
@@ -12,6 +14,7 @@ class RatingStars extends StatefulWidget {
     this.fixed = false, // Default: not fixed, stars can be pressed
     this.size = 50.0, 
     this.grey = false, // Default star size
+    this.restaurantID = "",
     this.controller, // Controller is optional
   });
 
@@ -52,9 +55,21 @@ class _RatingStarsState extends State<RatingStars> {
           onTap: widget.fixed
               ? null // If fixed is true, the stars are non-interactive
               : () {
-                  setState(() {
-                    _controller.rating = index + 1; // Update the controller's rating
-                  });
+                  if (widget.restaurantID.isEmpty) {
+                    _controller.rating = index + 1;
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Material(
+                          child: WriteReviewScreen(
+                            restaurant: widget.restaurantID,
+                            initialRating: index + 1,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                 },
           child: Container(
             padding: const EdgeInsets.all(1), // Reduces the clickable area
@@ -62,7 +77,7 @@ class _RatingStarsState extends State<RatingStars> {
               index < _controller.rating
                   ? Icons.star_rounded
                   : Icons.star_border_rounded, // Filled or empty star
-              color: widget.grey ? const Color(0xFFB9B9B9) : const Color(0xFFFFEEAD), // Star color
+              color: widget.grey ? const Color(0xFFB9B9B9) : const Color.fromARGB(255, 255, 212, 40), // Star color
               size: widget.size, // Use the passed-in star size
             ),
           ),

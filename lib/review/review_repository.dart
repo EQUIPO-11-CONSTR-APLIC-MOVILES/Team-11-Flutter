@@ -2,6 +2,27 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
 class ReviewRepository {
+  Future<List<Map<String, dynamic>>> getReviews(String? restaurantID) async {
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    List<Map<String, dynamic>> reviews = [];
+
+    try {
+      final snapshot = await db.collection('reviews').where('restaurantId', isEqualTo: restaurantID).get();
+      print("Getting reviews for restaurant $restaurantID");
+      for (var doc in snapshot.docs) {
+        print(doc.data());
+        reviews.add(doc.data());
+      }
+    } catch (e) {
+      print("Error getting reviews: $e");
+      if (e is FirebaseException) {
+        print("FirebaseException: ${e.message}");
+      }
+    }
+
+    return reviews;
+  }
+
   Future<void> registerReview(Map<String, dynamic> review) async {
 
     final FirebaseFirestore _db = FirebaseFirestore.instance;

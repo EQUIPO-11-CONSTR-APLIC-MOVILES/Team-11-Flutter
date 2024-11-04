@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:restau/models/restaurant.dart';
+import 'package:restau/review/review_list.dart';
 import 'package:restau/widgets/schedule_popup.dart';
 
 class IconsRow extends StatelessWidget {
@@ -21,7 +22,17 @@ class IconsRow extends StatelessWidget {
           child: _buildIconWithName(Icons.calendar_month, 'Schedule'),
         ),
         _buildIconWithName(Icons.call, 'Contact'),
-        _buildIconWithName(Icons.star, 'Rate'),
+        GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ReviewListScreen(restaurantID: restaurant.getId()), // Pass the restaurant ID here
+            ),
+          );
+        },
+        child: _buildIconWithName(Icons.star, 'Rate'),
+      ),
       ],
     );
   }
