@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Add provider package
+import 'package:provider/provider.dart';
 import 'package:restau/navigation/user_viewmodel.dart';
 import 'package:restau/search/search_view.dart';
 import 'navigator_viewmodel.dart';
@@ -8,7 +8,6 @@ import '../home/home_screen.dart';
 import '../views/random_screen.dart';
 import '../liked/liked_screen.dart';
 import '../map/map_screen.dart';
-
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({super.key});
@@ -20,17 +19,24 @@ class NavigatorScreen extends StatefulWidget {
 class NavigatorScreenState extends State<NavigatorScreen> {
   UserViewModel activeUser = UserViewModel();
 
-  static final List<Widget> _widgetOptions = <Widget>[
-    const HomeScreen(),
-    const RandomScreen(),
-    const SearchScreen(),
-    const LikedScreen(),
-    const MapScreen(),
-  ];
+  final GlobalKey<RandomScreenState> _randomScreenKey = GlobalKey<RandomScreenState>();
+
+  late List<Widget> _widgetOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    _widgetOptions = <Widget>[
+      const HomeScreen(),
+      RandomScreen(key: _randomScreenKey),
+      const SearchScreen(),
+      const LikedScreen(),
+      const MapScreen(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Wrap the whole widget with ChangeNotifierProvider if not already done at a higher level
     return ChangeNotifierProvider(
       create: (context) => NavigatorViewModel(),
       child: Scaffold(
@@ -77,14 +83,16 @@ class NavigatorScreenState extends State<NavigatorScreen> {
         ),
         body: Padding(
           padding: const EdgeInsets.only(top: 16.0),
-          // Listen to changes in the selectedIndex from the NavigatorViewModel
           child: Consumer<NavigatorViewModel>(
             builder: (context, vm, child) {
-              // Check if apiMessage is not empty and show a popup
               if (vm.apiMessage.isNotEmpty) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   _showApiMessagePopup(context, vm);
                 });
+              }
+              final randomScreenState = _randomScreenKey.currentState;
+              if (vm.selectedIndex == 1) {
+                randomScreenState?.fetchRandomRestaurant();
               }
               return _widgetOptions.elementAt(vm.selectedIndex);
             },
@@ -142,7 +150,6 @@ class NavigatorScreenState extends State<NavigatorScreen> {
     ).then((value) {
       if (value == 'logout') {
         activeUser.logOut();
-        // Optionally, navigate to the login screen or show a snackbar
       }
     });
   }
@@ -153,11 +160,9 @@ class NavigatorScreenState extends State<NavigatorScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          contentPadding: const EdgeInsets.fromLTRB(
-              24.0, 24.0, 24.0, 24.0), // Adjusts the padding
+          contentPadding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
           content: Padding(
-            padding: const EdgeInsets.only(
-                top: 20.0), // Custom top padding for the message
+            padding: const EdgeInsets.only(top: 20.0),
             child: Text(
               message,
               style: const TextStyle(

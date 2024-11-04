@@ -74,7 +74,7 @@ class _RestaurantItemState extends State<RestaurantItem> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      DetailScreen(restaurant: widget.restaurant),
+                      DetailScreen(restaurant: widget.restaurant,isRandom: false),
                 ),
               );
               // Optionally, still call sendPreferences if needed

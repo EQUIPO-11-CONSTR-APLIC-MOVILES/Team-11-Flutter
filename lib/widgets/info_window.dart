@@ -90,7 +90,7 @@ class CustomInfoWindow extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DetailScreen(restaurant: restaurant),
+                    builder: (context) => DetailScreen(restaurant: restaurant,isRandom: false),
                   ),
                 );
             },
