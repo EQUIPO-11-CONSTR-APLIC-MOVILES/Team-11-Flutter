@@ -11,8 +11,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 class DetailScreen extends StatefulWidget {
   final Restaurant restaurant;
+  final bool isRandom;
 
-  const DetailScreen({super.key, required this.restaurant});
+  const DetailScreen({super.key, required this.restaurant, required this.isRandom});
 
   @override
   _DetailScreenState createState() => _DetailScreenState();
@@ -90,7 +91,7 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: widget.isRandom ? null : AppBar(
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
