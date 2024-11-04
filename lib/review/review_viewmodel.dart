@@ -14,6 +14,10 @@ class ReviewViewmodel {
     return _instance;
   }
 
+  Future<List<Map<String, dynamic>>> getReviews(String restaurantID) async {
+    return repo.getReviews(restaurantID);
+  }
+
   String checkValidReview(description, rating) {
     if (description == null) {
       return 'null';
