@@ -12,8 +12,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 class DetailScreen extends StatefulWidget {
   final Restaurant restaurant;
   final bool isRandom;
+  final String randomReviewDocumentId;
 
-  const DetailScreen({super.key, required this.restaurant, required this.isRandom});
+  const DetailScreen({super.key, required this.restaurant, required this.isRandom, this.randomReviewDocumentId=""});
 
   @override
   _DetailScreenState createState() => _DetailScreenState();
@@ -161,7 +162,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 16.0),
-                  IconsRow(restaurant: widget.restaurant),
+                  IconsRow(restaurant: widget.restaurant, randomReviewDocumentId: widget.randomReviewDocumentId),
                   const SizedBox(height: 16.0),
                   Text(
                     widget.restaurant.description,

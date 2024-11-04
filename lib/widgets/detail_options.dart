@@ -6,8 +6,9 @@ import 'package:restau/widgets/schedule_popup.dart';
 
 class IconsRow extends StatelessWidget {
   final Restaurant restaurant;
+  final String randomReviewDocumentId;
 
-  const IconsRow({super.key, required this.restaurant});
+  const IconsRow({super.key, required this.restaurant, this.randomReviewDocumentId=""});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ class IconsRow extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ReviewListScreen(restaurantID: restaurant.getId()), // Pass the restaurant ID here
+              builder: (context) => ReviewListScreen(restaurantID: restaurant.getId(), randomReviewDocumentId: randomReviewDocumentId),
             ),
           );
         },
