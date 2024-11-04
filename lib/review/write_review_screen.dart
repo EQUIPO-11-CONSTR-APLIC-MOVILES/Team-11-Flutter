@@ -56,7 +56,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
       final userName = await user.getUserName();
       final userPic = await user.getUserPic();
 
-      if (true) {
+      if (isOffline) {
         // Show offline message in a dialog
         showDialog(
           context: context,
@@ -69,6 +69,9 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
               actions: [
                 TextButton(
                   onPressed: () {
+                    // Send review (handles offline saving in ViewModel)
+                    vm.registerReview(userName, userPic, reviewController.text, starController.rating, widget.restaurant);
+                    widget.randomRepository.updateRandomReview(widget.randomReviewDocumentId);
                     Navigator.pop(context); // Close the dialog first
                     navigateBack(); // Then navigate back
                   },
@@ -82,12 +85,12 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
           },
         );
       } else {
+        // Send review (handles offline saving in ViewModel)
+        vm.registerReview(userName, userPic, reviewController.text, starController.rating, widget.restaurant);
+        widget.randomRepository.updateRandomReview(widget.randomReviewDocumentId);
         navigateBack();
       }
       
-      // Send review (handles offline saving in ViewModel)
-      vm.registerReview(userName, userPic, reviewController.text, starController.rating, widget.restaurant);
-      widget.randomRepository.updateRandomReview(widget.randomReviewDocumentId);
     } else if (res == 'length') {
       _errorMessage.value = "Please add a review before sending";
     } else if (res == 'rating') {
