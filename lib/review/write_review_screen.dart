@@ -98,88 +98,94 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Future.wait([user.getUserPic(), user.getUserName()]),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Error loading user info'));
-        } else {
-          final userPic = snapshot.data?[0];
-          final userName = snapshot.data?[1];
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Write review'),
+        centerTitle: true,
+      ),
+      body: FutureBuilder(
+        future: Future.wait([user.getUserPic(), user.getUserName()]),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Error loading user info'));
+          } else {
+            final userPic = snapshot.data?[0];
+            final userName = snapshot.data?[1];
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      userName ?? 'User',
-                      style: const TextStyle(fontSize: 18, fontFamily: 'Poppins', fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: userPic != null ? NetworkImage(userPic) : null,
-                      radius: 25,
-                    ),
-                    const Spacer(),
-                    RatingStars(controller: starController),
-                  ],
-                ),
-                SizedBox(height: elementSpacing),
-                TextField(
-                  controller: reviewController,
-                  maxLines: 13,
-                  minLines: 2,
-                  decoration: const InputDecoration(
-                    hintText: 'Share details of your own experience here',
-                    hintStyle: TextStyle(fontFamily: "Poppins", color: Colors.grey),
-                    border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                  ),
-                ),
-                ValueListenableBuilder<String?>(
-                  valueListenable: _errorMessage,
-                  builder: (context, error, child) {
-                    if (error == null) return SizedBox.shrink();
-                    return Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.info_outline, color: Colors.red),
-                          Text(
-                            error,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontFamily: 'Poppins',
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        userName ?? 'User',
+                        style: const TextStyle(fontSize: 18, fontFamily: 'Poppins', fontWeight: FontWeight.bold),
                       ),
-                    );
-                  },
-                ),
-                SizedBox(height: elementSpacing),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: sendReview,
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(const Color(0xFFD9534F)),
-                    ),
-                    child: const Text('Submit'),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          );
-        }
-      },
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: userPic != null ? NetworkImage(userPic) : null,
+                        radius: 25,
+                      ),
+                      const Spacer(),
+                      RatingStars(controller: starController),
+                    ],
+                  ),
+                  SizedBox(height: elementSpacing),
+                  TextField(
+                    controller: reviewController,
+                    maxLines: 13,
+                    minLines: 2,
+                    decoration: const InputDecoration(
+                      hintText: 'Share details of your own experience here',
+                      hintStyle: TextStyle(fontFamily: "Poppins", color: Colors.grey),
+                      border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                    ),
+                  ),
+                  ValueListenableBuilder<String?>(
+                    valueListenable: _errorMessage,
+                    builder: (context, error, child) {
+                      if (error == null) return const SizedBox.shrink();
+                      return Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.info_outline, color: Colors.red),
+                            Text(
+                              error,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: elementSpacing),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: sendReview,
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(const Color(0xFFD9534F)),
+                      ),
+                      child: const Text('Submit'),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 }
