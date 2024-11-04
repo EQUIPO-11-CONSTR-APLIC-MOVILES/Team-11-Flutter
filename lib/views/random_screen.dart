@@ -8,10 +8,10 @@ class RandomScreen extends StatefulWidget {
   const RandomScreen({super.key});
 
   @override
-  State<RandomScreen> createState() => _RandomScreenState();
+  State<RandomScreen> createState() => RandomScreenState();
 }
 
-class _RandomScreenState extends State<RandomScreen> {
+class RandomScreenState extends State<RandomScreen> {
   final RestaurantRepository restaurantRepository = RestaurantRepository();
   Restaurant? randomRestaurant;
 
@@ -39,7 +39,7 @@ class _RandomScreenState extends State<RandomScreen> {
           Center(
             child: randomRestaurant == null
                 ? const CircularProgressIndicator()
-                : DetailScreen(restaurant: randomRestaurant!,isRandom: true),
+                : DetailScreen(restaurant: randomRestaurant!, isRandom: true),
           ),
         ],
       ),
