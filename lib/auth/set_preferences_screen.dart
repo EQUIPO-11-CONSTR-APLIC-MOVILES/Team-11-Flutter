@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:restau/auth/register_viewmodel.dart';
 import 'package:restau/auth/auth_screen.dart';
@@ -15,15 +16,38 @@ class SetPreferencesScreen extends StatelessWidget {
     final RegisterViewModel vm = RegisterViewModel();
     Set<String> selectedPreferences = {};
 
-    void attemptRegister() async {
-      vm.registerUser(mail, user, password, selectedPreferences.toList());
-
+    void finishLogIn(){
       Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const AuthScreen(),
-        ),
-      );
+          context,
+          MaterialPageRoute(
+            builder: (context) => const AuthScreen(),
+          ),
+        );
+    }
+
+    Future<void> attemptRegister() async {
+      var connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        // Show a dialog if there's no internet connection
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('No Internet Connection'),
+            content: const Text('Please connect to the internet to complete the register process.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        // Proceed with the registration if there’s an internet connection
+        vm.registerUser(mail, user, password, selectedPreferences.toList());
+        await Future.delayed(const Duration(seconds: 1));
+        finishLogIn();
+      }
     }
 
     return Scaffold(
