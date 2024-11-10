@@ -74,11 +74,11 @@ class _DetailScreenState extends State<DetailScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('No Internet Connection'),
-          content: Text('Please check your internet connection and try again.'),
+          title: const Text('No Internet Connection'),
+          content: const Text('Please check your internet connection and try again.'),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -119,14 +119,23 @@ class _DetailScreenState extends State<DetailScreen> {
           children: [
             SizedBox(
               width: double.infinity,
+              height: MediaQuery.of(context).size.height / 2, // Max height 1/3 of screen
               child: CachedNetworkImage(
                 imageUrl: widget.restaurant.imageUrl,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
+                placeholder: (context, url) => Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.wifi_off, size: 40, color: Colors.grey), // Placeholder icon
+                    SizedBox(height: 8),
+                    Text(
+                      "Connect to the internet to load this image",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
                 ),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
-                fit:
-                    BoxFit.cover, // This will ensure the image covers the width
+                fit: BoxFit.cover, // Ensures image covers the width
               ),
             ),
             Padding(
