@@ -147,12 +147,14 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                   SizedBox(height: elementSpacing),
                   TextField(
                     controller: reviewController,
+                    maxLength:100000,
                     maxLines: 13,
                     minLines: 2,
                     decoration: const InputDecoration(
                       hintText: 'Share details of your own experience here',
                       hintStyle: TextStyle(fontFamily: "Poppins", color: Colors.grey),
                       border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                      counterText: "",
                     ),
                   ),
                   ValueListenableBuilder<String?>(
