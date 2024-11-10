@@ -122,9 +122,9 @@ class _DetailScreenState extends State<DetailScreen> {
               height: MediaQuery.of(context).size.height / 2, // Max height 1/3 of screen
               child: CachedNetworkImage(
                 imageUrl: widget.restaurant.imageUrl,
-                placeholder: (context, url) => Column(
+                placeholder: (context, url) => const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(Icons.wifi_off, size: 40, color: Colors.grey), // Placeholder icon
                     SizedBox(height: 8),
                     Text(

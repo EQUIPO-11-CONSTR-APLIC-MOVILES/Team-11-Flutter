@@ -123,6 +123,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 SizedBox(height: elementSpacing),
                 TextField(
                   controller: userController,
+                  maxLength: 320,
                   decoration: const InputDecoration(
                     hintText: 'Email',
                     hintStyle: TextStyle(fontFamily: "Poppins"),
@@ -130,12 +131,14 @@ class _LogInScreenState extends State<LogInScreen> {
                     border: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black),
                     ),
+                    counterText: "",
                   ),
                 ),
                 SizedBox(height: elementSpacing),
                 TextField(
                   controller: passwordController,
                   obscureText: _obscurePassword,
+                  maxLength: 32,
                   decoration: InputDecoration(
                     hintText: 'Password',
                     hintStyle: const TextStyle(fontFamily: 'Poppins'),
@@ -152,6 +155,7 @@ class _LogInScreenState extends State<LogInScreen> {
                     border: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black),
                     ),
+                    counterText:"",
                   ),
                 ),
                 SizedBox(height: elementSpacing),
