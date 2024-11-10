@@ -94,6 +94,7 @@ class _RestaurantListState extends State<RestaurantList> {
                 ),
               ),
             ),
+            const SizedBox(height: 40),
         ],
       ),
     );
