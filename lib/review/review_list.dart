@@ -45,7 +45,8 @@ class _ReviewListScreenState extends State<ReviewListScreen> {
                 const SizedBox(height: 8.0),
                 RatingStars(
                   controller: StarRatingController(),
-                  size: 30.0,
+                  size: 45.0,
+                  grey:true,
                   restaurantID: widget.restaurantID,
                   randomReviewDocumentId: widget.randomReviewDocumentId,
                 ),

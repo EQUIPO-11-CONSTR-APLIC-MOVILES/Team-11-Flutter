@@ -29,6 +29,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
   final ValueNotifier<String?> _errorMessage = ValueNotifier(null);
   StreamSubscription? connectivitySubscription;
   bool isOffline = false;
+  bool _dataLoaded = false; 
 
   @override
   void initState() {
@@ -70,7 +71,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                 TextButton(
                   onPressed: () {
                     // Send review (handles offline saving in ViewModel)
-                    vm.registerReview(userName, userPic, reviewController.text, starController.rating, widget.restaurant);
+                    vm.registerReview(userName, userPic, reviewController.text.trim(), starController.rating, widget.restaurant);
                     widget.randomRepository.updateRandomReview(widget.randomReviewDocumentId);
                     Navigator.pop(context); // Close the dialog first
                     navigateBack(); // Then navigate back
@@ -86,7 +87,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
         );
       } else {
         // Send review (handles offline saving in ViewModel)
-        vm.registerReview(userName, userPic, reviewController.text, starController.rating, widget.restaurant);
+        vm.registerReview(userName, userPic, reviewController.text.trim(), starController.rating, widget.restaurant);
         widget.randomRepository.updateRandomReview(widget.randomReviewDocumentId);
         navigateBack();
       }
@@ -114,11 +115,27 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
       body: FutureBuilder(
         future: Future.wait([user.getUserPic(), user.getUserName()]),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting && !_dataLoaded) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(child: Text('Error loading user info'));
-          } else {
+          } else if (snapshot.hasError && !_dataLoaded && isOffline) {
+            // Show a message if there's no internet and data hasn't loaded before
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.wifi_off, size: 48, color: Colors.grey),
+                  SizedBox(height: 8),
+                  Text(
+                    "Connect to the internet to write a review",
+                    style: TextStyle(fontFamily: 'Poppins', color: Colors.grey, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
+          } else if (snapshot.hasData) {
+            _dataLoaded = true; // Data loaded successfully
+
             final userPic = snapshot.data?[0];
             final userName = snapshot.data?[1];
 
@@ -148,7 +165,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                   TextField(
                     controller: reviewController,
                     maxLength:100000,
-                    maxLines: 13,
+                    maxLines: 15,
                     minLines: 2,
                     decoration: const InputDecoration(
                       hintText: 'Share details of your own experience here',
@@ -194,6 +211,9 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
               ),
             );
           }
+
+          // Return an empty container if none of the above conditions are met
+          return const SizedBox.shrink();
         },
       ),
     );
