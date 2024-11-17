@@ -3,6 +3,7 @@ import 'package:restau/widgets/rating_stars.dart';
 import 'package:restau/review/review_viewmodel.dart';
 import 'package:restau/widgets/star_rating_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:restau/navigation/user_viewmodel.dart';
 
 class ReviewListScreen extends StatefulWidget {
   final String restaurantID;
@@ -17,11 +18,14 @@ class ReviewListScreen extends StatefulWidget {
 class _ReviewListScreenState extends State<ReviewListScreen> {
   final ReviewViewmodel reviewViewmodel = ReviewViewmodel();
   late Future<List<Map<String, dynamic>>> reviewsFuture;
+  final UserViewModel user = UserViewModel();
+  late Future<String?> userPicFuture;
 
   @override
   void initState() {
     super.initState();
     reviewsFuture = reviewViewmodel.getReviews(widget.restaurantID);
+    userPicFuture = user.getUserPic();
   }
 
   @override
@@ -42,15 +46,32 @@ class _ReviewListScreenState extends State<ReviewListScreen> {
                   'Rate & Review',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8.0),
-                RatingStars(
-                  controller: StarRatingController(),
-                  size: 45.0,
-                  grey:true,
-                  restaurantID: widget.restaurantID,
-                  randomReviewDocumentId: widget.randomReviewDocumentId,
-                ),
-                const Divider(),
+                Row( children: [
+                  FutureBuilder<String?>(
+                    future: userPicFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return const Icon(Icons.error);
+                      } else {
+                        final userPic = snapshot.data ?? '';
+                        return CircleAvatar(
+                          backgroundImage: NetworkImage(userPic),
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 8.0),
+                  RatingStars(
+                    controller: StarRatingController(),
+                    size: 45.0,
+                    grey:true,
+                    restaurantID: widget.restaurantID,
+                    randomReviewDocumentId: widget.randomReviewDocumentId,
+                  ),
+                  const Divider(),
+                ]),
               ],
             ),
           ),
@@ -61,7 +82,7 @@ class _ReviewListScreenState extends State<ReviewListScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return const Center(child: Text('Error loading reviews'));
+                  return const Center(child: Text('Internet connection is needed to load reviews.'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(child: Text('No reviews available.'));
                 } else {
