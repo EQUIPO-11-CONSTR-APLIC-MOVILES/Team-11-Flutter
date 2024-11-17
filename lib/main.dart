@@ -9,8 +9,8 @@ import 'package:flutter/services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Ensure that the app runs in portrait mode only
-  SystemChrome.setPreferredOrientations([
+  // Ensure the app runs in portrait mode only
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
 
@@ -22,11 +22,12 @@ void main() async {
   // Set up Firebase Crashlytics to log Flutter errors
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
-  // Capture errors in the zone (this catches errors in async operations)
-  runZonedGuarded<Future<void>>(() async {
-    runApp(const RestaUApp());
-  }, (error, stackTrace) {
-    // Log Dart errors that are outside Flutter framework (asynchronous errors)
+  // Run the app
+  runApp(const RestaUApp());
+
+  // Capture errors in the zone
+  runZonedGuarded(() {}, (error, stackTrace) {
+    // Log Dart errors outside Flutter framework
     FirebaseCrashlytics.instance.recordError(error, stackTrace);
   });
 }

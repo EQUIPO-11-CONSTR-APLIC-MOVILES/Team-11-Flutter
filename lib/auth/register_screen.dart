@@ -120,6 +120,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: elementSpacing),
                 TextField(
                   controller: userController,
+                  maxLength: 32,
                   decoration: const InputDecoration(
                     hintText: 'Name',
                     hintStyle: TextStyle(fontFamily: "Poppins"),
@@ -127,11 +128,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     border: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black),
                     ),
+                    counterText: "",
                   ),
                 ),
                 SizedBox(height: elementSpacing),
                 TextField(
                   controller: mailController,
+                  maxLength: 320,
                   decoration: const InputDecoration(
                     hintText: 'Email',
                     hintStyle: TextStyle(fontFamily: "Poppins"),
@@ -139,12 +142,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     border: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black),
                     ),
+                    counterText: "",
                   ),
                 ),
                 SizedBox(height: elementSpacing),
                 TextField(
                   controller: passwordController,
                   obscureText: obscurePassword,
+                  maxLength: 32,
                   decoration: InputDecoration(
                     hintText: 'Password',
                     hintStyle: const TextStyle(fontFamily: 'Poppins'),
@@ -157,6 +162,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         color: Color(0xFFD9534F),
                       ),
                     ),
+                    counterText: "",
                     border: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black),
                     ),

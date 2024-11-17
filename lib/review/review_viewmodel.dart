@@ -21,7 +21,7 @@ class ReviewViewmodel {
   String checkValidReview(description, rating) {
     if (description == null) {
       return 'null';
-    } else if (description.length <= 1){
+    } else if (description.trim().length <= 1){
       return 'length';
     } else if (rating == 0){
       return 'rating';
