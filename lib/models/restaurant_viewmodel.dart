@@ -23,4 +23,9 @@ class RestaurantViewmodel {
   Future<List<String>> getTopRestaurants() async{
     return await repo.getTopRestaurants();
   }
+
+  Future<void> registerMapSearch() async{
+    return await repo.registerMapSearch();
+  }
+
 }
