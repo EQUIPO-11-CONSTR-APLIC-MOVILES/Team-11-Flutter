@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:restau/navigation/user_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserViewModel {
   final UserRepository repo = UserRepository();
@@ -37,25 +38,9 @@ class UserViewModel {
   }
 
   Future<String?> getUserPic() async {
-    String? email = FirebaseAuth.instance.currentUser?.email;
-
-    // Check if the email is null
-    if (email == null) {
-      print('No user is currently logged in.');
-      return null; // Or handle the case appropriately
-    }
-
-    // Fetch user information using the email
-    Map<String, dynamic>? userInfo = await repo.getUserInfoByEmail(email);
-
-    // Check if userInfo is null
-    if (userInfo != null) {
-      // Return the profile picture URL
-      return userInfo['profilePic'] as String?;
-    } else {
-      print('User info not found for email: $email');
-      return null; // Or handle the case appropriately
-    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? profilePic = prefs.getString('user_profile_pic');
+    return profilePic;
   }
 
   Future<Map<String, dynamic>?> getUserInfo() async {
@@ -81,25 +66,9 @@ class UserViewModel {
   }
 
   Future<String?> getUserName() async {
-    String? email = FirebaseAuth.instance.currentUser?.email;
-
-    // Check if the email is null
-    if (email == null) {
-      print('No user is currently logged in.');
-      return null; // Or handle the case appropriately
-    }
-
-    // Fetch user information using the email
-    Map<String, dynamic>? userInfo = await repo.getUserInfoByEmail(email);
-
-    // Check if userInfo is null
-    if (userInfo != null) {
-      // Return the profile picture URL
-      return userInfo['name'] as String?;
-    } else {
-      print('User info not found for email: $email');
-      return null; // Or handle the case appropriately
-    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? name = prefs.getString('user_name');
+    return name;
   }
 
   Future<List<String>> getLikedRestaurants() async {
