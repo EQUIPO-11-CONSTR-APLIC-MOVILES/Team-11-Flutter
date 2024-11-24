@@ -30,6 +30,39 @@ class UserRepository {
     }
   }
 
+  Future<void> updateUserName(String newName) async {
+    try {
+      // Get the current user's email
+      String? email = FirebaseAuth.instance.currentUser?.email;
+
+      if (email == null) {
+        throw Exception("User is not logged in.");
+      }
+
+      // Query the user's document in Firestore
+      QuerySnapshot querySnapshot = await _db.collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Get the document ID of the user
+        String docId = querySnapshot.docs.first.id;
+
+        // Update the name in Firestore
+        await _db.collection('users').doc(docId).update({'name': newName});
+
+        // Optionally update SharedPreferences if needed
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_name', newName);
+
+        print("User name updated successfully.");
+      } else {
+        print('No user found with email: $email');
+      }
+    } catch (e) {
+      print("Error updating user name: $e");
+    }
+  }
   Future<Map<String, dynamic>?> getUserInfoByEmail(String email) async {
     try {
       QuerySnapshot querySnapshot =

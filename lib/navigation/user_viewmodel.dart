@@ -107,6 +107,10 @@ class UserViewModel {
     }
   }
 
+  Future<void> updateUserName(String name) async{
+    repo.updateUserName(name);
+  }
+
   void logOut(){
     repo.logOut();
   }
