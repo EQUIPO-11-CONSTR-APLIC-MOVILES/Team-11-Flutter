@@ -58,11 +58,7 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   void signInGoogle() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      // TODO: remove
-      email: 's.chamie@uniandes.edu.co',
-      password: 'aaaaaa',
-    );
+    vm.logIn('s.chamie@uniandes.edu.co', 'aaaaaa');
   }
 
   void signUp() {

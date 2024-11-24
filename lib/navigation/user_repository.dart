@@ -1,10 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  void logOut() {
+  void logOut() async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user_name');
+    await prefs.remove('user_profile_pic');
+    print("borrao");
     FirebaseAuth.instance.signOut();
   }
 
