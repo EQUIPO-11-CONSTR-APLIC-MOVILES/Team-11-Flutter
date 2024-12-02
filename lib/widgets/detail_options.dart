@@ -3,19 +3,32 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:restau/models/restaurant.dart';
 import 'package:restau/review/review_list.dart';
 import 'package:restau/widgets/schedule_popup.dart';
+import 'package:restau/menu/menu_screen.dart'; // Import the MenuScreen
 
 class IconsRow extends StatelessWidget {
   final Restaurant restaurant;
   final String randomReviewDocumentId;
 
-  const IconsRow({super.key, required this.restaurant, this.randomReviewDocumentId=""});
+  const IconsRow(
+      {super.key, required this.restaurant, this.randomReviewDocumentId = ""});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildIconWithName(Icons.fastfood, 'Menu'),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MenuScreen(
+                    restaurantID: restaurant.getId()), // Navigate to MenuScreen
+              ),
+            );
+          },
+          child: _buildIconWithName(Icons.fastfood, 'Menu'),
+        ),
         GestureDetector(
           onTap: () {
             _showSchedulePopup(context, restaurant);
@@ -24,16 +37,18 @@ class IconsRow extends StatelessWidget {
         ),
         _buildIconWithName(Icons.call, 'Contact'),
         GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ReviewListScreen(restaurantID: restaurant.getId(), randomReviewDocumentId: randomReviewDocumentId),
-            ),
-          );
-        },
-        child: _buildIconWithName(Icons.star, 'Rate'),
-      ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ReviewListScreen(
+                    restaurantID: restaurant.getId(),
+                    randomReviewDocumentId: randomReviewDocumentId),
+              ),
+            );
+          },
+          child: _buildIconWithName(Icons.star, 'Rate'),
+        ),
       ],
     );
   }
