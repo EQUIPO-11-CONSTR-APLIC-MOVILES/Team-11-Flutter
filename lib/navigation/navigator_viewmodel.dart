@@ -103,7 +103,7 @@ class NavigatorViewModel extends ChangeNotifier {
       final lat = _currentLocation!.latitude;
       final lon = _currentLocation!.longitude;
 
-      String apiURL = "http://34.134.5.98:8000";
+      String apiURL = "http://35.239.202.192:8000";
 
       //print("fetching");
       final response = await http
