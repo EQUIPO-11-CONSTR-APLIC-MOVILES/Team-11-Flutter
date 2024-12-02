@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -20,10 +21,32 @@ class AuthRepository {
 
   Future<void> logIn(String username, String password) async {
     try {
+      QuerySnapshot querySnapshot =
+          await _db.collection('users').where('email', isEqualTo: username).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        Map<String, dynamic> userData = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        String? name = userData['name'] as String?;    
+        String? pp = userData['profilePic'] as String?; 
+        // Save user details to shared preferences
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        if (name != null) {
+          await prefs.setString('user_name', name);
+        }
+        if (pp != null) {
+          await prefs.setString('user_profile_pic', pp);
+        }
+        print("User details saved: Name: $name, Profile Pic: $pp");   
+      } else {
+        print("No user data found in Firestore.");
+      }
+
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: username,
         password: password,
       );
+
+      
     } on FirebaseAuthException catch (e) {
       // Handle specific Firebase authentication errors
       switch (e.code) {
@@ -42,7 +65,10 @@ class AuthRepository {
     }
   }
 
-  void logOut() {
+  void logOut() async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user_name');
+    await prefs.remove('user_profile_pic');
     FirebaseAuth.instance.signOut();
   }
 
@@ -51,7 +77,6 @@ class AuthRepository {
   }
 
   Future<void> registerUserInAuth(String mail, String pass) async {
-    print('si');
     try {
       print("Attempting to create user with email: $mail and password: $pass");
       await FirebaseAuth.instance.createUserWithEmailAndPassword(

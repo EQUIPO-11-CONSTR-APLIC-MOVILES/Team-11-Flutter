@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:restau/auth/log_in_viewmodel.dart';
@@ -58,11 +57,7 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   void signInGoogle() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      // TODO: remove
-      email: 's.chamie@uniandes.edu.co',
-      password: 'aaaaaa',
-    );
+    vm.logIn('s.chamie@uniandes.edu.co', 'aaaaaa');
   }
 
   void signUp() {
