@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts
+import 'package:google_maps_flutter_platform_interface/src/types/location.dart';
 import 'package:restau/models/restaurant.dart';
 import 'package:restau/models/restaurant_viewmodel.dart';
 import 'package:restau/navigation/user_viewmodel.dart';
@@ -8,6 +9,8 @@ import 'package:restau/widgets/detail_options.dart';
 import 'package:restau/widgets/restaurant_tags.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:location/location.dart' as location_pkg;
 
 class DetailScreen extends StatefulWidget {
   final Restaurant restaurant;
@@ -25,6 +28,7 @@ class _DetailScreenState extends State<DetailScreen> {
   late UserViewModel vm;
   late RestaurantViewmodel rvm;
   List<String> likedRestaurantIds = [];
+  Text? distanceText;
 
   @override
   void initState() {
@@ -32,6 +36,7 @@ class _DetailScreenState extends State<DetailScreen> {
     vm = UserViewModel();
     rvm = RestaurantViewmodel();
     fetchLikedRestaurants();
+    checkAndFetchDistance();
   }
 
   Future<void> fetchLikedRestaurants() async {
@@ -40,6 +45,51 @@ class _DetailScreenState extends State<DetailScreen> {
     setState(() {
       isLiked = likedRestaurantIds.contains(widget.restaurant.getId());
     });
+  }
+
+  Future<void> checkAndFetchDistance() async {
+    if (await Permission.location.isGranted) {
+      final userLocation = await fetchUserLocation();
+      if (userLocation != null) {
+        widget.restaurant.calculateDistance(
+            LatLng(userLocation.latitude!, userLocation.longitude!));
+        setState(() {
+          final distance = widget.restaurant.distance;
+          String message;
+          Color color;
+
+          if (distance > 3) {
+            message = "Far";
+            color = const Color(0xFFD9534F);
+          } else if (distance > 1) {
+            message = "Moderate";
+            color = const Color(0xFFF4792C);
+          } else {
+            message = "Near";
+            color = const Color(0xFF008615);
+          }
+
+          distanceText = Text(
+            '${distance.toStringAsFixed(1)} km - $message',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          );
+        });
+      }
+    } else {
+      setState(() {
+        distanceText = null; // Don't display distance
+      });
+    }
+  }
+
+
+  Future<location_pkg.LocationData?> fetchUserLocation() async {
+    final location_pkg.Location location = location_pkg.Location();
+    return await location.getLocation();
   }
 
   void toggleLike() {
@@ -152,6 +202,7 @@ class _DetailScreenState extends State<DetailScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  if (distanceText != null) distanceText!,
                   const SizedBox(height: 8.0),
                   Row(
                     children: [
