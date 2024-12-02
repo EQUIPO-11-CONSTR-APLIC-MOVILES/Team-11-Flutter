@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts
-import 'package:google_maps_flutter_platform_interface/src/types/location.dart';
 import 'package:restau/models/restaurant.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:restau/models/restaurant_viewmodel.dart';
 import 'package:restau/navigation/user_viewmodel.dart';
 import 'package:restau/widgets/detail_options.dart';
@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:location/location.dart' as location_pkg;
+import 'package:http/http.dart' as http;
 
 class DetailScreen extends StatefulWidget {
   final Restaurant restaurant;
@@ -29,6 +30,7 @@ class _DetailScreenState extends State<DetailScreen> {
   late RestaurantViewmodel rvm;
   List<String> likedRestaurantIds = [];
   Text? distanceText;
+  Text? matchText;
 
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _DetailScreenState extends State<DetailScreen> {
     rvm = RestaurantViewmodel();
     fetchLikedRestaurants();
     checkAndFetchDistance();
+    fetchMatch();
   }
 
   Future<void> fetchLikedRestaurants() async {
@@ -60,7 +63,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
           if (distance > 3) {
             message = "Far";
-            color = const Color(0xFFD9534F);
+            color = const Color(0xFFB10000);
           } else if (distance > 1) {
             message = "Moderate";
             color = const Color(0xFFF4792C);
@@ -90,6 +93,44 @@ class _DetailScreenState extends State<DetailScreen> {
   Future<location_pkg.LocationData?> fetchUserLocation() async {
     final location_pkg.Location location = location_pkg.Location();
     return await location.getLocation();
+  }
+
+  Future<void> fetchMatch() async {
+    String apiURL = "http://35.239.202.192:8000";
+    String? userID = await vm.getUserId();
+    String restaurantID = widget.restaurant.getId();
+    String url = "$apiURL/match-percentage?userID=$userID&restaurantID=$restaurantID";
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      double match = double.parse(response.body);
+      String matchString;
+      Color color;
+      if (match % 1 == 0) {
+        matchString = match.toInt().toString();
+      } else {
+        matchString = match.toStringAsFixed(1);
+      }
+
+      if (match < 15) {
+        color = const Color(0xFFB10000);
+      } else if (match < 30) {
+        color = const Color(0xFFF4792C);
+      } else {
+        color = const Color(0xFF008615);
+      }
+
+      setState(() {
+        matchText = Text(
+          '$matchString% match',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        );
+      });
+    }
   }
 
   void toggleLike() {
@@ -195,12 +236,19 @@ class _DetailScreenState extends State<DetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.restaurant.name,
-                    style: GoogleFonts.poppins(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.restaurant.name,
+                        style: GoogleFonts.poppins(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 16.0),
+                      matchText ?? const SizedBox.shrink(),
+                    ],
                   ),
                   if (distanceText != null) distanceText!,
                   const SizedBox(height: 8.0),
