@@ -60,19 +60,20 @@ class _DetailScreenState extends State<DetailScreen> {
 
           if (distance > 3) {
             message = "Far";
-            color = Colors.red;
+            color = const Color(0xFFD9534F);
           } else if (distance > 1) {
             message = "Moderate";
-            color = Colors.orange;
+            color = const Color(0xFFF4792C);
           } else {
             message = "Near";
-            color = Colors.green;
+            color = const Color(0xFF008615);
           }
 
           distanceText = Text(
             '${distance.toStringAsFixed(1)} km - $message',
             style: GoogleFonts.poppins(
               fontSize: 16,
+              fontWeight: FontWeight.w600,
               color: color,
             ),
           );
