@@ -60,6 +60,8 @@ class _DetailScreenState extends State<DetailScreen> {
       return;
     }
 
+    rvm.registerMapSearch();
+
     final url =
         'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
     if (await canLaunch(url)) {
