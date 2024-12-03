@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:restau/models/menu_item.dart';
 import 'package:restau/menu/menu_items_repository.dart';
+import 'package:restau/menu/menu_item_detail.dart';
 
 class MenuScreen extends StatelessWidget {
   final String restaurantID;
+  final String restaurantName; // Add restaurantName
 
-  const MenuScreen({super.key, required this.restaurantID});
+  const MenuScreen({super.key, required this.restaurantID, required this.restaurantName});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +56,15 @@ class MenuScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
                           onPressed: () {
-                            // Navigate to detail screen (implement detail screen as needed)
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MenuItemDetail(
+                                  menuItem: menuItem,
+                                  restaurantName: restaurantName, // Pass restaurantName
+                                ),
+                              ),
+                            );
                           },
                           child: Text('Details'),
                         ),

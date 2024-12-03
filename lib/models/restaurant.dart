@@ -86,6 +86,10 @@ class Restaurant {
     return id;
   }
 
+  String getName() {
+    return name;
+  }
+
   List<String> getTypes() {
     return categories;
   }
