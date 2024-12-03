@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:restau/models/menu_item.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,11 +39,26 @@ class MenuItemDetail extends StatelessWidget {
             const SizedBox(height: 16.0),
             ClipRRect(
               borderRadius: BorderRadius.circular(25.0),
-              child: Image.network(
-                menuItem.imageUrl,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+              child: CachedNetworkImage(
+                imageUrl: menuItem.imageUrl,
+                fit: BoxFit.fill,
+                placeholder: (context, url) => const CircularProgressIndicator(),
+                errorWidget: (context, url, error) => const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error,
+                      size: 50,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Unable to load image (connect to internet)',
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 16.0),
+                  ],
+                ),
+              )
             ),
             const SizedBox(height: 16.0),
             // Title of the menu item with bold styling
