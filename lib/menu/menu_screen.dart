@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:restau/models/menu_item.dart';
 import 'package:restau/menu/menu_items_repository.dart';
+import 'package:restau/menu/menu_item_detail.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class MenuScreen extends StatelessWidget {
   final String restaurantID;
-  final String restaurantName;
+  final String restaurantName; // Add restaurantName
 
-  const MenuScreen(
-      {super.key, required this.restaurantID, required this.restaurantName});
+  const MenuScreen({super.key, required this.restaurantID, required this.restaurantName});
 
   @override
   Widget build(BuildContext context) {
@@ -60,26 +60,34 @@ class MenuScreen extends StatelessWidget {
                           children: [
                             Text(
                               menuItem.name,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 8.0),
                             Text(
                               'Price: \$${menuItem.price}',
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 8.0),
                             ElevatedButton(
                               onPressed: () {
-                                // Navigate to detail screen (implement detail screen as needed)
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MenuItemDetail(
+                                      menuItem: menuItem,
+                                      restaurantName: restaurantName, // Pass restaurantName
+                                    ),
+                                  ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
                                 backgroundColor: Colors.red, // Text color
                               ),
-                              child: Text('Details'),
+                              child: const Text('Details'),
                             ),
                           ],
                         ),
