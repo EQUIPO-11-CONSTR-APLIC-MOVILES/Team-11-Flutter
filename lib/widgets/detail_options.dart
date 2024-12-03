@@ -23,7 +23,7 @@ class IconsRow extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => MenuScreen(
-                    restaurantID: restaurant.getId(), restaurantName: restaurant.getName(),), // Pass the restaurant name
+                  restaurantID: restaurant.getId(), restaurantName: restaurant.getName(),), // Pass the restaurant name
               ),
             );
           },

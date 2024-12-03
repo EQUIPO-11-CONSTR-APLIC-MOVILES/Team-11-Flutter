@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:restau/models/menu_item.dart';
 import 'package:restau/menu/menu_items_repository.dart';
 import 'package:restau/menu/menu_item_detail.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class MenuScreen extends StatelessWidget {
   final String restaurantID;
@@ -13,11 +14,12 @@ class MenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Menu'),
+        title: Text(restaurantName),
+        centerTitle: true,
+        leading: const Icon(Icons.menu_book),
       ),
       body: FutureBuilder<List<MenuItem>>(
-        future:
-            MenuItemsRepository().fetchMenuItemsByRestaurantId(restaurantID),
+        future: _fetchMenuItems(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -32,41 +34,62 @@ class MenuScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final menuItem = menuItems[index];
                 return Card(
-                  margin: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  elevation: 4.0,
+                  child: Row(
                     children: [
-                      Image.network(menuItem.imageUrl),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          menuItem.name,
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                      // Image on the left
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: Image.network(
+                          menuItem.imageUrl,
+                          height: 120,
+                          width: 120,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          'Price: \$${menuItem.price}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => MenuItemDetail(
-                                  menuItem: menuItem,
-                                  restaurantName: restaurantName, // Pass restaurantName
-                                ),
+                      const SizedBox(width: 16.0),
+                      // Text details on the right
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              menuItem.name,
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              'Price: \$${menuItem.price}',
+                              style: const TextStyle(fontSize: 16),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8.0),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MenuItemDetail(
+                                      menuItem: menuItem,
+                                      restaurantName: restaurantName, // Pass restaurantName
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.red, // Text color
                               ),
-                            );
-                          },
-                          child: Text('Details'),
+                              child: const Text('Details'),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -78,5 +101,14 @@ class MenuScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Future<List<MenuItem>> _fetchMenuItems() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      return MenuItemsRepository().getCachedMenuItems(restaurantID);
+    } else {
+      return MenuItemsRepository().fetchMenuItemsByRestaurantId(restaurantID);
+    }
   }
 }
